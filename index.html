@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="en" id="html-root">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mizaj — Traditional Food Temperament Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F6FA;
+    --surface:#FFFFFF;
+    --surface-2:#FBFBFE;
+    --border:#E7E9F2;
+    --text:#14172B;
+    --text-soft:#6B7085;
+    --text-faint:#9BA0B4;
+    --brand:#5B4FE9;
+    --brand-soft:#EEEBFF;
+    --hot:#EF4444;
+    --hot-soft:#FEECEC;
+    --cold:#3B82F6;
+    --cold-soft:#EAF1FE;
+    --wet:#06B6D4;
+    --dry:#D97706;
+    --blood:#EF4444;
+    --bile-y:#F59E0B;
+    --bile-b:#6366F1;
+    --phlegm:#06B6D4;
+    --track:#EEF0F6;
+    --shadow-sm:0 1px 2px rgba(20,23,43,.06), 0 1px 1px rgba(20,23,43,.04);
+    --shadow-md:0 8px 24px rgba(20,23,43,.08), 0 2px 6px rgba(20,23,43,.05);
+    --shadow-lg:0 24px 60px rgba(20,23,43,.18);
+    --radius:16px;
+    --radius-sm:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    line-height:1.5;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  body.rtl{ font-family:'Vazirmatn','Inter', sans-serif; direction:rtl; }
+  h1,h2,h3,.jakarta{ font-family:'Plus Jakarta Sans', sans-serif; }
+  body.rtl h1, body.rtl h2, body.rtl h3, body.rtl .jakarta{ font-family:'Vazirmatn','Plus Jakarta Sans', sans-serif; }
+  .mono{ font-family:'IBM Plex Mono', monospace; }
+  body.rtl .mono{ font-family:'Vazirmatn','IBM Plex Mono', monospace; }
+  ::selection{ background:var(--brand); color:#fff; }
+  a{color:inherit;}
+  button{font-family:inherit;}
+
+  .wrap{ max-width:1240px; margin:0 auto; padding:0 24px 140px; }
+
+  /* ---------- TOP BAR ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:40;
+    background:rgba(245,246,250,.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .topbar-inner{
+    max-width:1240px; margin:0 auto; padding:16px 24px;
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand-mark{
+    width:34px; height:34px; border-radius:10px;
+    background:linear-gradient(135deg, var(--brand), #8B7CFF);
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-weight:800; font-size:16px;
+    flex-shrink:0;
+  }
+  .brand-text{ font-weight:800; font-size:17px; letter-spacing:-.01em; }
+  .brand-sub{ font-size:11px; color:var(--text-faint); font-weight:500; }
+  .lang-toggle{
+    display:flex; background:var(--surface); border:1px solid var(--border);
+    border-radius:20px; padding:3px; box-shadow:var(--shadow-sm);
+  }
+  .lang-toggle button{
+    font-size:12.5px; font-weight:700; letter-spacing:.02em;
+    padding:7px 14px; background:none; border:none; cursor:pointer;
+    color:var(--text-soft); border-radius:16px; transition:.15s;
+  }
+  .lang-toggle button.active{ background:var(--brand); color:#fff; }
+
+  /* ---------- HERO ---------- */
+  header.hero{ padding:44px 0 30px; }
+  h1.title{ font-weight:800; font-size:clamp(28px,4.2vw,42px); margin:0 0 8px; letter-spacing:-.02em; }
+  .lede{ max-width:620px; color:var(--text-soft); font-size:15.5px; margin:0; }
+  .lede b{ color:var(--text); font-weight:700; }
+
+  /* ---------- STAT CARDS ---------- */
+  .stats-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:28px; }
+  .stat-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:16px 18px; box-shadow:var(--shadow-sm);
+  }
+  .stat-icon{ font-size:20px; margin-bottom:8px; }
+  .stat-num{ font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:24px; letter-spacing:-.02em; }
+  body.rtl .stat-num{ font-family:'Vazirmatn',sans-serif; }
+  .stat-label{ font-size:12px; color:var(--text-soft); font-weight:600; margin-top:2px; }
+
+  /* ---------- SECTION ---------- */
+  section{ margin-top:44px; }
+  .section-head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+  .section-title{ font-weight:800; font-size:20px; letter-spacing:-.01em; margin:0; }
+  .section-sub{ color:var(--text-soft); font-size:13.5px; margin:2px 0 0; }
+
+  /* ---------- HUMOR OVERVIEW CARDS ---------- */
+  .humor-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+  .humor-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:18px; box-shadow:var(--shadow-sm); cursor:pointer; transition:.15s;
+    position:relative; overflow:hidden;
+  }
+  .humor-card:hover{ box-shadow:var(--shadow-md); transform:translateY(-2px); }
+  .humor-card::before{ content:""; position:absolute; inset-inline-start:0; top:0; bottom:0; width:4px; background:var(--accent); }
+  .humor-dot-lg{ width:30px; height:30px; border-radius:9px; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:15px; margin-bottom:10px;}
+  .humor-card h3{ font-size:15.5px; font-weight:800; margin:0 0 2px; }
+  .humor-card .qual{ font-size:11px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:.04em; margin-bottom:8px; }
+  body.rtl .humor-card .qual{ letter-spacing:0; }
+  .humor-card p{ font-size:12.5px; color:var(--text-soft); margin:0; }
+
+  /* ---------- CONTROLS ---------- */
+  .controls{ display:flex; flex-direction:column; gap:12px; margin-bottom:20px; }
+  .controls-row1{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .search-box{
+    flex:1; min-width:220px; position:relative;
+  }
+  .search-box input{
+    width:100%; background:var(--surface); border:1px solid var(--border);
+    color:var(--text); font-family:inherit; font-size:14px; padding:11px 16px 11px 40px;
+    border-radius:12px; outline:none; box-shadow:var(--shadow-sm);
+  }
+  body.rtl .search-box input{ padding:11px 40px 11px 16px; }
+  .search-box .icon{ position:absolute; inset-inline-start:14px; top:50%; transform:translateY(-50%); color:var(--text-faint); font-size:14px; }
+  .search-box input:focus{ border-color:var(--brand); }
+  .search-box input::placeholder{ color:var(--text-faint); }
+
+  .segmented{
+    display:flex; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:3px; box-shadow:var(--shadow-sm);
+  }
+  .segmented button{
+    border:none; background:none; padding:8px 14px; font-size:13px; font-weight:700;
+    color:var(--text-soft); cursor:pointer; border-radius:9px; transition:.15s; display:flex; align-items:center; gap:6px;
+  }
+  .segmented button.active{ background:var(--text); color:#fff; }
+
+  select.sort-select{
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:10px 14px; font-size:13px; font-weight:600; color:var(--text); box-shadow:var(--shadow-sm);
+    cursor:pointer; outline:none; font-family:inherit;
+  }
+
+  .chip-row{ display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; scrollbar-width:thin; }
+  .chip-row::-webkit-scrollbar{ height:5px; }
+  .chip-row::-webkit-scrollbar-thumb{ background:var(--border); border-radius:10px; }
+  .chip{
+    flex-shrink:0; font-size:12.5px; font-weight:700; padding:8px 14px; border-radius:20px;
+    border:1px solid var(--border); background:var(--surface); color:var(--text-soft);
+    cursor:pointer; transition:.15s; display:flex; align-items:center; gap:6px; white-space:nowrap;
+  }
+  .chip:hover{ border-color:var(--brand); color:var(--text); }
+  .chip.active{ background:var(--text); border-color:var(--text); color:#fff; }
+  .chip .dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+  /* ---------- COMPASS VIEW ---------- */
+  .compass-panel{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:26px; box-shadow:var(--shadow-sm);
+    display:grid; grid-template-columns:minmax(280px,440px) 1fr; gap:30px; align-items:center;
+  }
+  svg#wheel{ width:100%; height:auto; display:block; cursor:pointer; }
+  .wheel-point{ cursor:pointer; transition:r .12s ease, opacity .15s; }
+  .wheel-point.dim{ opacity:.12; }
+  .compass-side h3{ font-size:16px; font-weight:800; margin:0 0 6px; }
+  .compass-side p{ font-size:13px; color:var(--text-soft); margin:0 0 16px; }
+  .legend{ display:flex; flex-direction:column; gap:8px; }
+  .legend-item{
+    display:flex; align-items:center; gap:10px; font-size:12.5px; font-weight:600;
+    cursor:pointer; padding:8px 10px; border-radius:10px; border:1px solid transparent; transition:.15s;
+  }
+  .legend-item:hover, .legend-item.active{ background:var(--surface-2); border-color:var(--border); }
+  .legend-dot{ width:11px; height:11px; border-radius:50%; flex-shrink:0; }
+  .legend-item .clear-hint{ margin-inline-start:auto; opacity:.4; font-size:10.5px; font-weight:700; }
+
+  #tooltip{
+    position:fixed; pointer-events:none; z-index:200; background:var(--text); color:#fff;
+    padding:6px 10px; border-radius:8px; font-size:12px; font-weight:600; display:none;
+    box-shadow:var(--shadow-md); white-space:nowrap;
+  }
+
+  /* ---------- GRID VIEW ---------- */
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(230px,1fr)); gap:14px; }
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:16px; cursor:pointer; transition:.15s; box-shadow:var(--shadow-sm);
+    display:flex; flex-direction:column; gap:12px; position:relative;
+  }
+  .card:hover{ box-shadow:var(--shadow-md); transform:translateY(-2px); border-color:#DADCEB; }
+  .card-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+  .card-photo{
+    width:44px; height:44px; border-radius:12px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:22px; line-height:1;
+    background:var(--tile-bg, var(--surface-2)); border:1px solid var(--border);
+  }
+  .drawer-photo{ width:72px; height:72px; border-radius:18px; font-size:36px; }
+  .card h5{ font-size:15px; font-weight:800; margin:2px 0 0; letter-spacing:-.005em; }
+  .card .secondary-name{ font-size:12px; color:var(--text-faint); margin-top:1px; }
+  .add-btn{
+    width:28px; height:28px; border-radius:50%; border:1.5px solid var(--border);
+    background:var(--surface); color:var(--text-soft); font-size:15px; font-weight:800;
+    cursor:pointer; display:flex; align-items:center; justify-content:center; transition:.15s; flex-shrink:0;
+  }
+  .add-btn:hover{ border-color:var(--brand); color:var(--brand); }
+  .add-btn.added{ background:var(--brand); border-color:var(--brand); color:#fff; }
+  .humor-pill{
+    align-self:flex-start; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.03em;
+    padding:3px 8px; border-radius:20px; color:#fff;
+  }
+  body.rtl .humor-pill{ letter-spacing:0; }
+
+  .gauges{ display:flex; gap:10px; }
+  .gauge{ flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .gauge-ring{
+    width:56px; height:56px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; position:relative;
+    background:conic-gradient(var(--ring-color) calc(var(--pct)*1%), var(--track) 0);
+  }
+  .gauge-ring::before{ content:""; position:absolute; inset:6px; border-radius:50%; background:var(--surface); }
+  .gauge-ring span{ position:relative; font-family:'Plex Mono','IBM Plex Mono',monospace; font-size:12px; font-weight:700; }
+  .gauge-label{ font-size:10.5px; font-weight:700; color:var(--text-soft); text-transform:uppercase; letter-spacing:.03em; }
+  body.rtl .gauge-label{ letter-spacing:0; }
+
+  .empty-msg{ grid-column:1/-1; text-align:center; padding:60px 20px; color:var(--text-faint); font-size:13.5px; font-weight:600; }
+
+  /* ---------- DRAWER ---------- */
+  .drawer-backdrop{
+    position:fixed; inset:0; background:rgba(15,17,32,.45); z-index:90; display:none; backdrop-filter:blur(2px);
+  }
+  .drawer-backdrop.show{ display:block; }
+  .drawer{
+    position:fixed; top:0; bottom:0; inset-inline-end:0; width:min(420px,100vw); background:var(--surface);
+    z-index:91; box-shadow:var(--shadow-lg); transform:translateX(100%); transition:transform .25s ease;
+    overflow-y:auto; padding:24px;
+  }
+  body.rtl .drawer{ transform:translateX(-100%); }
+  .drawer.show{ transform:translateX(0); }
+  .drawer-close{
+    width:32px; height:32px; border-radius:50%; border:1px solid var(--border); background:var(--surface-2);
+    cursor:pointer; font-size:14px; color:var(--text-soft); display:flex; align-items:center; justify-content:center;
+    margin-bottom:18px;
+  }
+  .drawer h4{ font-size:24px; font-weight:800; margin:0 0 2px; letter-spacing:-.01em; }
+  .drawer .d-secondary{ font-size:14px; color:var(--text-faint); margin-bottom:14px; }
+  .drawer .d-pill-row{ display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+  .drawer .d-pill{ font-size:11.5px; font-weight:700; padding:5px 11px; border-radius:20px; color:#fff; }
+  .drawer .gauges-lg{ display:flex; gap:16px; margin-bottom:20px; }
+  .drawer .gauge-ring-lg{
+    width:88px; height:88px; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative;
+    background:conic-gradient(var(--ring-color) calc(var(--pct)*1%), var(--track) 0);
+  }
+  .drawer .gauge-ring-lg::before{ content:""; position:absolute; inset:9px; border-radius:50%; background:var(--surface); }
+  .drawer .gauge-ring-lg span{ position:relative; font-family:'IBM Plex Mono',monospace; font-size:18px; font-weight:700; }
+  .drawer .note{ font-size:14px; color:var(--text-soft); line-height:1.65; margin:0 0 18px; }
+  .drawer .note-hint{ font-size:12px; color:var(--text-faint); font-style:italic; margin:-10px 0 18px; }
+  .drawer-add-btn{
+    width:100%; padding:13px; border-radius:12px; border:none; background:var(--brand); color:#fff;
+    font-weight:800; font-size:14px; cursor:pointer; transition:.15s;
+  }
+  .drawer-add-btn.added{ background:var(--surface-2); color:var(--text-soft); border:1.5px solid var(--border); }
+
+  /* ---------- FLOATING TRAY ---------- */
+  .tray{
+    position:fixed; bottom:22px; inset-inline-end:22px; z-index:80;
+    background:var(--text); color:#fff; border-radius:30px; padding:12px 20px 12px 14px;
+    display:none; align-items:center; gap:10px; cursor:pointer; box-shadow:var(--shadow-lg);
+    font-weight:700; font-size:13.5px; transition:.15s;
+  }
+  body.rtl .tray{ padding:12px 14px 12px 20px; }
+  .tray.show{ display:flex; }
+  .tray:hover{ transform:translateY(-2px); }
+  .tray-badge{
+    background:var(--brand); width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:800;
+  }
+
+  /* ---------- BALANCE MODAL ---------- */
+  .modal-backdrop{ position:fixed; inset:0; background:rgba(15,17,32,.5); z-index:100; display:none; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(2px); }
+  .modal-backdrop.show{ display:flex; }
+  .modal{
+    background:var(--surface); border-radius:20px; width:100%; max-width:520px; max-height:88vh; overflow-y:auto;
+    padding:26px; box-shadow:var(--shadow-lg);
+  }
+  .modal-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  .modal h3{ font-size:20px; font-weight:800; margin:0; }
+  .modal-close{ width:30px; height:30px; border-radius:50%; border:1px solid var(--border); background:var(--surface-2); cursor:pointer; font-size:13px; }
+  .plate-list{ display:flex; flex-direction:column; gap:8px; margin:16px 0 20px; }
+  .plate-item{
+    display:flex; align-items:center; gap:10px; background:var(--surface-2); border:1px solid var(--border);
+    border-radius:12px; padding:9px 12px;
+  }
+  .plate-item .dot{ width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+  .plate-item .name{ flex:1; font-size:13.5px; font-weight:700; }
+  .plate-item .remove{ border:none; background:none; color:var(--text-faint); cursor:pointer; font-size:15px; padding:2px 6px; }
+  .balance-visual{ display:flex; align-items:center; gap:20px; margin-bottom:18px; }
+  svg#mini-compass{ width:140px; height:140px; flex-shrink:0; }
+
+  /* ---------- DRAWER COMPASS + MOSLEH ---------- */
+  .drawer-compass-wrap{
+    display:flex; align-items:center; gap:16px; background:var(--surface-2);
+    border:1px solid var(--border); border-radius:14px; padding:14px 16px; margin-bottom:18px;
+  }
+  svg#d-compass{ width:104px; height:104px; flex-shrink:0; }
+  .compass-caption{ font-size:12.5px; color:var(--text-soft); line-height:1.5; }
+  .compass-caption b{ color:var(--text); }
+  .section-mini-title{ font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.04em; color:var(--text-faint); margin:0 0 8px; }
+  body.rtl .section-mini-title{ letter-spacing:0; }
+  .mosleh-section{ margin-bottom:20px; }
+  .mosleh-note{ font-size:13px; color:var(--text-soft); margin:0 0 10px; line-height:1.55; }
+  .mosleh-chips{ display:flex; gap:8px; flex-wrap:wrap; }
+  .mosleh-chip{
+    font-size:12.5px; font-weight:700; padding:7px 12px; border-radius:20px; border:1.5px dashed var(--border);
+    background:var(--surface-2); cursor:pointer; transition:.15s; display:flex; align-items:center; gap:6px;
+  }
+  .mosleh-chip:hover{ border-color:var(--brand); color:var(--brand); }
+  .verdict-text{ font-size:14px; color:var(--text-soft); line-height:1.6; }
+  .verdict-title{ font-weight:800; font-size:15px; color:var(--text); margin-bottom:4px; }
+  .suggest-title{ font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.04em; color:var(--text-faint); margin:18px 0 10px; }
+  body.rtl .suggest-title{ letter-spacing:0; }
+  .suggest-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .suggest-chip{
+    font-size:12.5px; font-weight:700; padding:8px 13px; border-radius:20px; border:1.5px dashed var(--border);
+    background:var(--surface-2); cursor:pointer; transition:.15s; display:flex; align-items:center; gap:6px;
+  }
+  .suggest-chip:hover{ border-color:var(--brand); color:var(--brand); }
+  .clear-plate-btn{
+    width:100%; margin-top:20px; padding:11px; border-radius:12px; border:1px solid var(--border);
+    background:var(--surface); color:var(--text-soft); font-weight:700; font-size:13px; cursor:pointer;
+  }
+  .empty-plate{ text-align:center; padding:30px 10px; color:var(--text-faint); font-size:13.5px; }
+
+  footer{ margin-top:60px; padding-top:24px; border-top:1px solid var(--border); font-size:12px; color:var(--text-faint); max-width:720px; line-height:1.6; }
+  footer p{ margin:0 0 8px; }
+
+  @media (max-width:860px){
+    .stats-row{ grid-template-columns:repeat(2,1fr); }
+    .humor-grid{ grid-template-columns:repeat(2,1fr); }
+    .compass-panel{ grid-template-columns:1fr; }
+  }
+  @media (max-width:520px){
+    .wrap{ padding:0 16px 140px; }
+    .topbar-inner{ padding:14px 16px; }
+    .drawer{ width:100vw; }
+  }
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important; } }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-mark">م</div>
+      <div>
+        <div class="brand-text">Mizaj</div>
+        <div class="brand-sub" data-i18n="brandSub">Traditional Food Temperament Tracker</div>
+      </div>
+    </div>
+    <div class="lang-toggle">
+      <button id="btn-en" class="active" onclick="setLang('en')">EN</button>
+      <button id="btn-fa" onclick="setLang('fa')">فا</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <header class="hero">
+    <h1 class="title" data-i18n="h1">Know your food's temperament</h1>
+    <p class="lede" data-i18n-html="lede"></p>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon">🍽️</div>
+        <div class="stat-num" id="stat-count">0</div>
+        <div class="stat-label" data-i18n="statIngredients">Ingredients tracked</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🗂️</div>
+        <div class="stat-num" id="stat-cats">0</div>
+        <div class="stat-label" data-i18n="statCategories">Categories</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚖️</div>
+        <div class="stat-num">4</div>
+        <div class="stat-label" data-i18n="statHumors">Humors</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-num mono">1–4</div>
+        <div class="stat-label" data-i18n="statDegrees">Degree scale</div>
+      </div>
+    </div>
+  </header>
+
+  <section id="humors-section">
+    <div class="section-head">
+      <div>
+        <h2 class="section-title" data-i18n="sec1title">The four humors</h2>
+        <p class="section-sub" data-i18n="sec1sub"></p>
+      </div>
+    </div>
+    <div class="humor-grid">
+      <div class="humor-card" style="--accent:var(--blood)" onclick="setHumorFilter('blood')">
+        <div class="humor-dot-lg">🩸</div>
+        <h3 data-i18n="h_blood_name">Blood — Dam</h3>
+        <div class="qual" data-i18n="h_blood_qual">Hot & Wet · Sanguine</div>
+        <p data-i18n="h_blood_desc"></p>
+      </div>
+      <div class="humor-card" style="--accent:var(--bile-y)" onclick="setHumorFilter('bile-y')">
+        <div class="humor-dot-lg">⚡</div>
+        <h3 data-i18n="h_biley_name">Yellow Bile — Ṣafrā</h3>
+        <div class="qual" data-i18n="h_biley_qual">Hot & Dry · Choleric</div>
+        <p data-i18n="h_biley_desc"></p>
+      </div>
+      <div class="humor-card" style="--accent:var(--bile-b)" onclick="setHumorFilter('bile-b')">
+        <div class="humor-dot-lg">🌙</div>
+        <h3 data-i18n="h_bileb_name">Black Bile — Saudā</h3>
+        <div class="qual" data-i18n="h_bileb_qual">Cold & Dry · Melancholic</div>
+        <p data-i18n="h_bileb_desc"></p>
+      </div>
+      <div class="humor-card" style="--accent:var(--phlegm)" onclick="setHumorFilter('phlegm')">
+        <div class="humor-dot-lg">💧</div>
+        <h3 data-i18n="h_phlegm_name">Phlegm — Balgham</h3>
+        <div class="qual" data-i18n="h_phlegm_qual">Cold & Wet · Phlegmatic</div>
+        <p data-i18n="h_phlegm_desc"></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="database">
+    <div class="section-head">
+      <div>
+        <h2 class="section-title" data-i18n="sec3title">Explore ingredients</h2>
+        <p class="section-sub" data-i18n="sec3sub"></p>
+      </div>
+      <div class="segmented" id="view-toggle">
+        <button class="active" data-view="grid" onclick="setView('grid')" data-i18n="viewGrid">▦ Grid</button>
+        <button data-view="compass" onclick="setView('compass')" data-i18n="viewCompass">◎ Compass</button>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="controls-row1">
+        <div class="search-box">
+          <span class="icon">🔍</span>
+          <input id="search" type="text" oninput="renderAll()">
+        </div>
+        <select class="sort-select" id="sort-select" onchange="renderAll()">
+          <option value="name" data-i18n="sortName">Sort: Name</option>
+          <option value="hot" data-i18n="sortHot">Sort: Hottest first</option>
+          <option value="cold" data-i18n="sortCold">Sort: Coldest first</option>
+          <option value="wet" data-i18n="sortWet">Sort: Moistest first</option>
+          <option value="dry" data-i18n="sortDry">Sort: Driest first</option>
+        </select>
+      </div>
+      <div class="chip-row" id="humor-chips"></div>
+      <div class="chip-row" id="cat-chips"></div>
+    </div>
+
+    <div id="compass-view" style="display:none;">
+      <div class="segmented" id="compass-mode-toggle" style="margin-bottom:14px;">
+        <button class="active" data-mode="mizaj" onclick="setCompassMode('mizaj')" data-i18n="modeMizaj">Mizāj</button>
+        <button data-mode="digest" onclick="setCompassMode('digest')" data-i18n="modeDigest">Digestibility</button>
+      </div>
+      <div class="compass-panel">
+        <div class="wheel-svg-wrap">
+          <svg id="wheel" viewBox="0 0 440 440"></svg>
+        </div>
+        <div class="compass-side">
+          <h3 id="compass-side-title"></h3>
+          <p id="compass-side-p"></p>
+          <div class="legend" id="legend"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="grid-view">
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <footer>
+    <p data-i18n="footer1"></p>
+    <p data-i18n="footer2"></p>
+  </footer>
+
+</div>
+
+<div id="tooltip"></div>
+
+<div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDetail()"></div>
+<div class="drawer" id="drawer">
+  <button class="drawer-close" onclick="closeDetail()">✕</button>
+  <div class="card-photo drawer-photo" id="d-emoji" style="margin-bottom:12px;"></div>
+  <h4 id="d-name"></h4>
+  <div class="d-secondary" id="d-secondary"></div>
+  <div class="d-pill-row" id="d-pills"></div>
+  <div class="gauges-lg">
+    <div class="gauge">
+      <div class="gauge-ring-lg" id="d-gauge-hc"><span id="d-gauge-hc-num"></span></div>
+      <div class="gauge-label" id="d-gauge-hc-label"></div>
+    </div>
+    <div class="gauge">
+      <div class="gauge-ring-lg" id="d-gauge-wd"><span id="d-gauge-wd-num"></span></div>
+      <div class="gauge-label" id="d-gauge-wd-label"></div>
+    </div>
+  </div>
+  <p class="note" id="d-note"></p>
+  <p class="note-hint" id="d-note-hint" style="display:none;"></p>
+
+  <div class="drawer-compass-wrap">
+    <svg id="d-compass" viewBox="0 0 104 104"></svg>
+    <div class="compass-caption" id="d-compass-caption"></div>
+  </div>
+
+  <div class="drawer-compass-wrap" style="flex-direction:column; align-items:flex-start;">
+    <div style="display:flex; align-items:center; gap:16px; width:100%;">
+      <svg id="d-digest-compass" viewBox="0 0 104 104"></svg>
+      <div class="compass-caption" id="d-digest-caption"></div>
+    </div>
+    <p class="mosleh-note" id="d-digest-source-note" style="display:none; margin:10px 0 0;"></p>
+  </div>
+
+  <div class="mosleh-section">
+    <div class="section-mini-title" id="mosleh-title"></div>
+    <p class="mosleh-note" id="mosleh-note"></p>
+    <div class="mosleh-chips" id="mosleh-chips"></div>
+  </div>
+
+  <button class="drawer-add-btn" id="d-add-btn" onclick="toggleDrawerAdd()"></button>
+</div>
+
+<div class="tray" id="tray" onclick="openBalanceModal()">
+  <div class="tray-badge" id="tray-count">0</div>
+  <span id="tray-label"></span>
+</div>
+
+<div class="modal-backdrop" id="modal-backdrop" onclick="if(event.target===this) closeBalanceModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 data-i18n="modalTitle">Your Plate Balance</h3>
+      <button class="modal-close" onclick="closeBalanceModal()">✕</button>
+    </div>
+    <div id="plate-content"></div>
+  </div>
+</div>
+
+<script>
+/* ---------------------------------------------------------
+   DATA
+--------------------------------------------------------- */
+const HUMORS = {
+  'blood':  {color:'#EF4444'},
+  'bile-y': {color:'#F59E0B'},
+  'bile-b': {color:'#6366F1'},
+  'phlegm': {color:'#06B6D4'}
+};
+/* Digestibility quadrants (Ilaj bil-Ghiza): Latif (light/easy) <-> Kasif (heavy/hard)
+   crossed with Kasir-ut-Taghzia (high nutritive density) <-> Qalil-ut-Taghzia (low).
+   Distinct palette from HUMORS to avoid implying they're the same framework. */
+const DIGEST_QUAD = {
+  'efficient': {color:'#10B981'}, // light + high nutrition  (e.g. egg yolk, dates)
+  'cleansing': {color:'#38BDF8'}, // light + low nutrition   (e.g. most fruit, veg, spice)
+  'hearty':    {color:'#F97316'}, // heavy + high nutrition  (e.g. red meat, whole grain)
+  'taxing':    {color:'#F43F5E'}  // heavy + low nutrition   (e.g. dry meat, hard cheese)
+};
+function digestQuadrant(f){
+  if(f.digest>=0) return f.nutri>=0 ? 'efficient' : 'cleansing';
+  return f.nutri>=0 ? 'hearty' : 'taxing';
+}
+const CAT_EMOJI = {
+  'fruit':'🍎','vegetable':'🥦','grain-legume':'🌾','protein':'🍗','dairy-fat':'🧈',
+  'nut-seed':'🥜','spice-herb':'🌿','sweetener':'🍯','beverage':'☕','condiment':'🍶'
+};
+/* Ingredient-specific icons where an accurate, unambiguous emoji exists.
+   Anything not listed here falls back to its category icon above —
+   this keeps every icon honest rather than forcing a loose visual guess. */
+const ICON_OVERRIDES = {
+  "Garlic":"🧄","Onion":"🧅","Dried Ginger":"🫚","Eggplant":"🍆","Carrot":"🥕",
+  "Cabbage":"🥬","Potato":"🥔","Tomato":"🍅","Mushroom":"🍄","Cucumber":"🥒",
+  "Lettuce":"🥬","Spinach":"🥬","Wheat":"🌾","Barley":"🌾","Rice":"🍚",
+  "Lamb":"🍖","White Fish":"🐟","Beef":"🥩","Chicken":"🍗","Shrimp":"🦐",
+  "Egg Yolk":"🥚","Egg White":"🥚","Milk (cow)":"🥛","Buttermilk (Doogh)":"🥛",
+  "Olive Oil":"🫒","Butter":"🧈","Aged Cheese":"🧀","Sunflower Seeds":"🌻",
+  "Pumpkin Seeds":"🎃","Coconut":"🥥","Honey":"🍯","Rock Candy (Nabat)":"🍬",
+  "Black Tea":"🍵","Green Tea":"🍵","Chamomile":"🍵","Coffee":"☕","Rosewater":"🌹",
+  "Dried Lime":"🍋","Fresh Lime":"🍋","Watermelon":"🍉","Melon":"🍈","Orange":"🍊",
+  "Sweet Apple":"🍎","Pear":"🍐","Sweet Grapes":"🍇","Raisins":"🍇","Banana":"🍌",
+  "Mango":"🥭","Sour Cherry":"🍒","Peach":"🍑",
+  "Pumpkin":"🎃","Bell Pepper":"🫑","Green Beans":"🫘","Broad Beans":"🫘","Sweet Potato":"🍠",
+  "Scallion":"🧅","Kiwi":"🥝","Pineapple":"🍍","Strawberry":"🍓","Chestnut":"🌰","Salt":"🧂"
+};
+function iconFor(f){ return ICON_OVERRIDES[f.name] || CAT_EMOJI[f.cat] || '🍽️'; }
+function hexToSoft(hex){
+  const n = parseInt(hex.slice(1),16);
+  const r=(n>>16)&255, g=(n>>8)&255, b=n&255;
+  return `rgba(${r},${g},${b},0.14)`;
+}
+
+const FOODS = [
+  {name:"Garlic", fa:"سیر", hot:4, wet:-3, digest:2, nutri:-2, humor:"bile-y", cat:"spice-herb", note:"Classed at the fourth, most intense degree of heat and dryness — the outer edge of the Canon's scale. Traditionally used to clear obstructions and expel cold, phlegmatic humors, but considered too fierce for choleric temperaments or inflamed conditions in quantity."},
+  {name:"Black Pepper", fa:"فلفل سیاه", hot:3, wet:-3, digest:2, nutri:-2, humor:"bile-y", cat:"spice-herb", note:"Hot and dry in the third degree; prized for kindling digestive heat and drying excess phlegm, but avoided in bilious or feverish constitutions."},
+  {name:"Dried Ginger", fa:"زنجبیل", hot:3, wet:-2, digest:2, nutri:-2, humor:"bile-y", cat:"spice-herb", note:"Warms the stomach and aids digestion of cold, moist foods; fresh ginger was considered milder than the dried root."},
+  {name:"Cinnamon", fa:"دارچین", hot:3, wet:-2, digest:2, nutri:-2, humor:"bile-y", cat:"spice-herb", note:"A strengthening, warming spice for the stomach and liver; used to counter phlegmatic sluggishness."},
+  {name:"Cloves", fa:"میخک", hot:3, wet:-3, digest:2, nutri:-2, humor:"bile-y", cat:"spice-herb", note:"Among the most drying aromatics; used sparingly to fortify a weak, cold stomach and sweeten the breath."},
+  {name:"Mustard Seed", fa:"خردل", hot:4, wet:-3, digest:2, nutri:-2, humor:"bile-y", cat:"spice-herb", note:"Very hot and dry; applied to draw out deep-seated cold humors, but held to irritate hot temperaments.", digestNote:"Named directly in Unani dietetics texts as an example of a food that is easy to digest and low in nutritive value, yet still classed as producing poor-quality chyme."},
+  {name:"Cardamom", fa:"هل", hot:2, wet:-2, digest:2, nutri:-2, humor:"bile-y", cat:"spice-herb", note:"A gentler warming spice than pepper or clove; settles digestion without excessive drying."},
+  {name:"Turmeric", fa:"زردچوبه", hot:2, wet:-2, digest:2, nutri:-2, humor:"bile-y", cat:"spice-herb", note:"Warms and dries moderately; traditionally used to move stagnant, cold humors and clear the complexion."},
+  {name:"Cumin", fa:"زیره", hot:2, wet:-2, digest:2, nutri:-2, humor:"bile-y", cat:"spice-herb", note:"Warms the stomach and disperses trapped wind; a mild, everyday spice rather than an intense one."},
+  {name:"Saffron", fa:"زعفران", hot:1, wet:-1, digest:2, nutri:-2, humor:"blood", cat:"spice-herb", note:"Mild in both heat and dryness (first degree) yet prized above stronger spices — said to gladden the heart, lift the spirit, and gently enrich the blood."},
+  {name:"Onion", fa:"پیاز", hot:3, wet:1, digest:1, nutri:-1, humor:"blood", cat:"vegetable", note:"Hot with a touch of moisture; thins and warms the blood, but held to cloud the mind and disturb sleep if eaten to excess."},
+  {name:"Walnuts", fa:"گردو", hot:2, wet:-2, digest:-1, nutri:2, humor:"bile-y", cat:"nut-seed", note:"Warming and drying; traditionally recommended in cold, damp seasons and thought to counter certain poisons."},
+  {name:"Pistachios", fa:"پسته", hot:2, wet:-1, digest:-1, nutri:1, humor:"blood", cat:"nut-seed", note:"Warms gently while nourishing the blood; considered strengthening for the liver and heart."},
+  {name:"Almonds (sweet)", fa:"بادام", hot:1, wet:1, digest:-1, nutri:1, humor:"blood", cat:"nut-seed", note:"Mildly hot and moist; softens the chest and lungs, and was ground into milk for those with a hot, dry constitution."},
+  {name:"Sesame Seeds", fa:"کنجد", hot:1, wet:2, digest:-1, nutri:1, humor:"blood", cat:"nut-seed", note:"Warm and notably moistening; its oil was used to soften dryness in the skin and joints."},
+  {name:"Honey", fa:"عسل", hot:2, wet:-1, digest:2, nutri:1, humor:"bile-y", cat:"sweetener", note:"Hot and mildly dry despite its liquid form; used as both food and remedy to cleanse and warm a cold stomach — but avoided by choleric or feverish patients."},
+  {name:"Dates", fa:"خرما", hot:2, wet:1, digest:1, nutri:2, humor:"blood", cat:"fruit", note:"Warming and gently moistening; a staple sustaining food said to build blood and flesh, best suited to cold temperaments."},
+  {name:"Fresh Figs", fa:"انجیر", hot:1, wet:2, digest:2, nutri:-1, humor:"blood", cat:"fruit", note:"Warm and moist; traditionally used to soften the chest and open obstructions of the liver and spleen."},
+  {name:"Raisins", fa:"کشمش", hot:1, wet:1, digest:0, nutri:1, humor:"blood", cat:"fruit", note:"A mild, nourishing sweetness; gently warming and used to strengthen a weak liver."},
+  {name:"Lamb", fa:"گوشت گوسفند", hot:1, wet:1, digest:-2, nutri:2, humor:"blood", cat:"protein", note:"Considered a balanced, blood-building meat — moderately hot and moist, and the classic protein for cold or convalescent constitutions."},
+  {name:"Chickpeas", fa:"نخود", hot:1, wet:1, digest:-1, nutri:1, humor:"blood", cat:"grain-legume", note:"Mildly warming and moistening; thought to generate wind but also to build flesh and aid the reproductive faculties."},
+  {name:"Wheat", fa:"گندم", hot:1, wet:1, digest:-1, nutri:1, humor:"blood", cat:"grain-legume", note:"Considered the most balanced staple grain — gently hot and moist, forming the foundation of a temperate diet."},
+  {name:"Rice", fa:"برنج", hot:-1, wet:-1, digest:1, nutri:0, humor:"bile-b", cat:"grain-legume", note:"Mildly cold and drying with a binding effect; used to firm loose stools and settle the stomach."},
+  {name:"Lentils", fa:"عدس", hot:-1, wet:-2, digest:-1, nutri:1, humor:"bile-b", cat:"grain-legume", note:"Cold and notably drying; nourishing but held to thicken the blood and lower the spirits if eaten too often."},
+  {name:"Barley", fa:"جو", hot:-2, wet:-1, digest:1, nutri:0, humor:"bile-b", cat:"grain-legume", note:"Cooling and drying; a classic food and broth for fevers and hot, inflamed conditions, thought gentler on digestion than wheat.", digestNote:"Barley water (māʾ al-shaʿīr) is one of the most frequently cited \"light\" foods in Unani texts — recommended in acute fevers specifically because it is easily absorbed and forms good chyme."},
+  {name:"Mung Beans", fa:"ماش", hot:-1, wet:-1, digest:2, nutri:0, humor:"bile-b", cat:"grain-legume", note:"Cold and drying but considered easy to digest; recommended for hot temperaments needing a light, cooling protein.", digestNote:"Notably lighter than most other pulses — Unani home-health sources single out mung specifically as the easy-to-digest exception, where legumes as a category are usually grouped as heavy."},
+  {name:"Vinegar", fa:"سرکه", hot:-2, wet:-2, digest:2, nutri:-2, humor:"bile-b", cat:"condiment", note:"Strongly cold and drying; used to cut through rich, hot foods, cool fevers, and counter the effect of excess blood or bile."},
+  {name:"Sumac", fa:"سماق", hot:-2, wet:-2, digest:2, nutri:-2, humor:"bile-b", cat:"condiment", note:"A sharp, cold, astringent souring agent; added to hot, oily dishes to balance their heat."},
+  {name:"Sour Pomegranate", fa:"انار ترش", hot:-2, wet:-2, digest:2, nutri:-2, humor:"bile-b", cat:"fruit", note:"Cold and drying, unlike its sweet counterpart; used to cool bilious heat and settle an upset, overheated stomach.", digestNote:"Pomegranate juice is one of the classical examples cited for forming especially good-quality chyme."},
+  {name:"Quince", fa:"به", hot:-1, wet:-1, digest:1, nutri:-2, humor:"bile-b", cat:"fruit", note:"Cool, astringent, and mildly drying; traditionally settles the stomach and was thought to strengthen the heart."},
+  {name:"Yogurt", fa:"ماست", hot:-1, wet:1, digest:1, nutri:0, humor:"phlegm", cat:"dairy-fat", note:"Cold and moist; cooling and nourishing, but held to encourage phlegm and was traditionally paired with warming herbs like mint or garlic."},
+  {name:"Milk (cow)", fa:"شیر", hot:-1, wet:2, digest:0, nutri:1, humor:"phlegm", cat:"dairy-fat", note:"Cold and notably moist; highly nourishing, especially recommended for hot, dry temperaments, but thought to burden a weak, cold stomach.", digestNote:"Explicitly cited as an example of a Motadil (moderate) diet — neither clearly light nor heavy — alongside dishes like khichdi."},
+  {name:"Cucumber", fa:"خیار", hot:-2, wet:2, digest:2, nutri:-2, humor:"phlegm", cat:"vegetable", note:"Strongly cold and moist; prized in hot climates and seasons to cool the blood, though held to dampen digestive fire if overeaten."},
+  {name:"Lettuce", fa:"کاهو", hot:-2, wet:2, digest:2, nutri:-2, humor:"phlegm", cat:"vegetable", note:"Cold, moist, and mildly sedative; classically eaten in the evening to cool the body and encourage restful sleep.", digestNote:"Named directly in Unani dietetics texts alongside radish and mustard as easy to digest and low in nutritive value, yet still classed as forming poor-quality chyme."},
+  {name:"Spinach", fa:"اسفناج", hot:-1, wet:2, digest:2, nutri:-1, humor:"phlegm", cat:"vegetable", note:"Cold and moist; used as a gentle laxative and to soothe a hot, irritated digestive tract."},
+  {name:"Watermelon", fa:"هندوانه", hot:-2, wet:3, digest:2, nutri:-2, humor:"phlegm", cat:"fruit", note:"Among the coldest, most moistening common fruits; a classic remedy against summer heat and thirst, but avoided by already phlegmatic constitutions."},
+  {name:"Melon", fa:"طالبی", hot:-2, wet:2, digest:2, nutri:-2, humor:"phlegm", cat:"fruit", note:"Cold and moist, similar to watermelon; traditionally eaten alone, away from other foods, to avoid disturbing digestion."},
+  {name:"Zucchini", fa:"کدو", hot:-2, wet:2, digest:2, nutri:-2, humor:"phlegm", cat:"vegetable", note:"Cold and moist; a light, easily digested vegetable recommended for hot, dry, or feverish states."},
+  {name:"White Fish", fa:"ماهی سفید", hot:-1, wet:2, digest:1, nutri:1, humor:"phlegm", cat:"protein", note:"Cold and moist flesh; considered lighter than red meat, suited to hot temperaments but thought to weaken a cold, moist stomach."},
+  {name:"Plum", fa:"آلو", hot:-1, wet:1, digest:2, nutri:-2, humor:"phlegm", cat:"fruit", note:"Cool and moist with a mild laxative effect; used to cleanse and cool a bilious constitution."},
+  {name:"Orange", fa:"پرتقال", hot:-1, wet:1, digest:2, nutri:-2, humor:"phlegm", cat:"fruit", note:"Cooling and moist, with the peel considered warmer and drier than the flesh — the two parts were sometimes prescribed separately."},
+  {name:"Sweet Apple", fa:"سیب", hot:-1, wet:1, digest:2, nutri:-2, humor:"phlegm", cat:"fruit", note:"Mildly cold and moist; a gentle, well-tolerated fruit thought to cheer the heart and cool mild fevers.", digestNote:"Apple juice is cited directly in classical sources as an example of a light food that forms especially good-quality chyme."},
+  {name:"Pear", fa:"گلابی", hot:-1, wet:1, digest:2, nutri:-2, humor:"phlegm", cat:"fruit", note:"Cool, moist, and slightly astringent; used to settle the stomach and cool bilious heat."},
+  {name:"Eggplant", fa:"بادمجان", hot:1, wet:-1, digest:1, nutri:-1, humor:"bile-y", cat:"vegetable", note:"Classed as hot in the popular Persian tradition, though opinions vary between sources; often paired with cooling yogurt to offset its heat and settle digestion.", digestNote:"One secondary source lists eggplant as \"heavy,\" but on closer reading that source is using \"heavy\" as a stand-in for the dry mizāj quality, not true digestibility — the academic Unani dietotherapy texts don't place it among the Kasīf (hard-to-digest) foods, so it's kept light here."},
+  {name:"Celery", fa:"کرفس", hot:2, wet:-1, digest:2, nutri:-2, humor:"bile-y", cat:"vegetable", note:"Warming and mildly drying; traditionally used to stimulate digestion and clear excess phlegm."},
+  {name:"Carrot", fa:"هویج", hot:1, wet:1, digest:1, nutri:-1, humor:"blood", cat:"vegetable", note:"Mildly warming and moist; said to nourish the blood and brighten the complexion."},
+  {name:"Beetroot", fa:"چغندر", hot:1, wet:1, digest:1, nutri:-1, humor:"blood", cat:"vegetable", note:"Warm and moist; traditionally used to enrich the blood and soothe the liver."},
+  {name:"Cabbage", fa:"کلم", hot:-1, wet:-1, digest:0, nutri:-1, humor:"bile-b", cat:"vegetable", note:"Cold and drying; held to be heavy on digestion and best eaten cooked with warming spices."},
+  {name:"Radish", fa:"تربچه", hot:2, wet:-2, digest:1, nutri:-2, humor:"bile-y", cat:"vegetable", note:"Hot and notably drying; sharp enough to cut phlegm and open obstructions, but easily upsets a delicate stomach.", digestNote:"Named directly in Unani dietetics texts alongside lettuce and mustard as easy to digest and low in nutritive value, yet still classed as forming poor-quality chyme."},
+  {name:"Leek", fa:"تره‌فرنگی", hot:2, wet:-1, digest:1, nutri:-1, humor:"bile-y", cat:"vegetable", note:"Warming and mildly drying, milder than garlic or onion but sharing their digestive-stimulating effect."},
+  {name:"Purslane", fa:"خرفه", hot:-2, wet:2, digest:2, nutri:-2, humor:"phlegm", cat:"vegetable", note:"Cold and moist; classically used to cool the blood and calm an overheated, bilious stomach."},
+  {name:"Okra", fa:"بامیه", hot:-1, wet:1, digest:1, nutri:-1, humor:"phlegm", cat:"vegetable", note:"Mildly cold and moist; its mucilage was thought to soothe an inflamed, hot digestive tract."},
+  {name:"Potato", fa:"سیب‌زمینی", hot:-1, wet:1, digest:0, nutri:1, humor:"phlegm", cat:"vegetable", note:"A New World crop absorbed into the living tradition as cold and moist; filling but held to burden a cold, weak stomach."},
+  {name:"Tomato", fa:"گوجه‌فرنگی", hot:-1, wet:2, digest:2, nutri:-2, humor:"phlegm", cat:"vegetable", note:"Another New World food folded into the tradition as cold and moist; contemporary practice often pairs it cautiously with cheese or cucumber, held to compound cold."},
+  {name:"Mushroom", fa:"قارچ", hot:-2, wet:2, digest:-1, nutri:-1, humor:"phlegm", cat:"vegetable", note:"Cold and moist; traditionally eaten sparingly and considered heavy, slow to digest."},
+  {name:"Fresh Mint", fa:"نعناع", hot:2, wet:-2, digest:2, nutri:-2, humor:"bile-y", cat:"spice-herb", note:"Hot and drying; a classic digestive aid said to warm the stomach and settle nausea."},
+  {name:"Basil", fa:"ریحان", hot:1, wet:1, digest:2, nutri:-2, humor:"blood", cat:"spice-herb", note:"Mildly warming and moist; used to lift the spirit and ease digestion."},
+  {name:"Parsley", fa:"جعفری", hot:2, wet:-2, digest:2, nutri:-2, humor:"bile-y", cat:"spice-herb", note:"Hot and drying; traditionally used as a diuretic and to clear obstructions of the kidneys and liver."},
+  {name:"Fenugreek", fa:"شنبلیله", hot:3, wet:-2, digest:0, nutri:-1, humor:"bile-y", cat:"spice-herb", note:"Strongly warming and drying; used to build strength after illness and to clear cold, phlegmatic congestion."},
+  {name:"Tarragon", fa:"ترخون", hot:2, wet:-1, digest:2, nutri:-2, humor:"bile-y", cat:"spice-herb", note:"Warming and mildly drying; traditionally chewed to settle the stomach and freshen the breath."},
+  {name:"Dill", fa:"شوید", hot:2, wet:-1, digest:2, nutri:-2, humor:"bile-y", cat:"spice-herb", note:"Warming and mildly drying; used to ease bloating and calm digestive spasms."},
+  {name:"Cilantro", fa:"گشنیز", hot:-1, wet:-1, digest:2, nutri:-2, humor:"bile-b", cat:"spice-herb", note:"Considered mildly cold and drying — unlike most aromatic herbs — and used to cool a mildly overheated stomach."},
+  {name:"Sweet Grapes", fa:"انگور", hot:2, wet:2, digest:1, nutri:-1, humor:"blood", cat:"fruit", note:"Warm and notably moist; a rich, blood-building fruit, though held to ferment and generate wind if overripe."},
+  {name:"Banana", fa:"موز", hot:-1, wet:2, digest:1, nutri:0, humor:"phlegm", cat:"fruit", note:"Cold and moist; nourishing but traditionally thought to encourage phlegm if eaten to excess."},
+  {name:"Mango", fa:"انبه", hot:2, wet:2, digest:-1, nutri:1, humor:"blood", cat:"fruit", note:"Warm and moist; absorbed into the tradition as a rich, blood-nourishing fruit.", digestNote:"Classical Unani sources group mango with jackfruit as an explicit example of a Kasīf (heavy, hard-to-digest) fruit — unlike most fruit, which falls in the light category."},
+  {name:"Apricot", fa:"زردآلو", hot:-1, wet:1, digest:2, nutri:-2, humor:"phlegm", cat:"fruit", note:"Mildly cold and moist; refreshing and gently laxative in traditional use."},
+  {name:"Sour Cherry", fa:"آلبالو", hot:-2, wet:1, digest:2, nutri:-2, humor:"phlegm", cat:"fruit", note:"Cold and moist with a sour, astringent edge; used to cool the blood and settle a bilious stomach."},
+  {name:"Peach", fa:"هلو", hot:-1, wet:1, digest:2, nutri:-2, humor:"phlegm", cat:"fruit", note:"Mildly cold and moist; a gentle, cooling summer fruit."},
+  {name:"White Mulberry", fa:"توت سفید", hot:-1, wet:1, digest:2, nutri:-2, humor:"phlegm", cat:"fruit", note:"Cold and moist; used to cool the body and soothe the throat."},
+  {name:"Black Mulberry", fa:"توت سیاه", hot:1, wet:1, digest:2, nutri:-2, humor:"blood", cat:"fruit", note:"Warmer than its white counterpart; traditionally used to enrich the blood."},
+  {name:"Sweet Pomegranate", fa:"انار شیرین", hot:1, wet:1, digest:2, nutri:-1, humor:"blood", cat:"fruit", note:"Unlike the sour variety, the sweet pomegranate is classed as warm and moist — nourishing to the blood.", digestNote:"Pomegranate juice generally is cited in classical sources as an example of a light food that forms especially good-quality chyme."},
+  {name:"Fresh Lime", fa:"لیمو ترش", hot:-2, wet:1, digest:2, nutri:-2, humor:"phlegm", cat:"fruit", note:"Cold and moist with a sharp sourness; used to cool bilious heat and cut through rich, hot foods."},
+  {name:"Dried Lime", fa:"لیمو عمانی", hot:-2, wet:-2, digest:2, nutri:-2, humor:"bile-b", cat:"condiment", note:"Dried and intensified in cold, drying power compared with the fresh fruit; used to season heavy, hot dishes and aid their digestion."},
+  {name:"Hazelnut", fa:"فندق", hot:2, wet:-1, digest:-1, nutri:1, humor:"bile-y", cat:"nut-seed", note:"Warming and mildly drying; considered strengthening for the stomach and lungs."},
+  {name:"Pine Nut", fa:"چلغوزه", hot:2, wet:1, digest:-1, nutri:1, humor:"blood", cat:"nut-seed", note:"Warm and moist; traditionally used to strengthen the body and aid a weak, cold stomach."},
+  {name:"Sunflower Seeds", fa:"تخمه آفتابگردان", hot:2, wet:-2, digest:-1, nutri:1, humor:"bile-y", cat:"nut-seed", note:"Warming and drying; a modern staple snack absorbed into the tradition's hot-dry seed family."},
+  {name:"Pumpkin Seeds", fa:"تخمه کدو", hot:1, wet:-1, digest:-1, nutri:1, humor:"bile-y", cat:"nut-seed", note:"Mildly warming and drying; traditionally used to expel intestinal parasites."},
+  {name:"Poppy Seeds", fa:"تخم خشخاش", hot:-2, wet:2, digest:0, nutri:0, humor:"phlegm", cat:"nut-seed", note:"Cold and moist; historically used in small amounts for its calming, sleep-inducing effect."},
+  {name:"Coconut", fa:"نارگیل", hot:2, wet:2, digest:-1, nutri:1, humor:"blood", cat:"nut-seed", note:"Warm and moist; a rich, nourishing food in traditions where it was known, said to build flesh and strength."},
+  {name:"Olive Oil", fa:"روغن زیتون", hot:1, wet:2, digest:-1, nutri:1, humor:"blood", cat:"dairy-fat", note:"Warm and notably moist; used both as food and topical remedy to soften dryness in skin and joints."},
+  {name:"Butter", fa:"کره", hot:1, wet:2, digest:-1, nutri:1, humor:"blood", cat:"dairy-fat", note:"Warm and moist; a rich, nourishing fat traditionally given to build up thin, weak, or cold constitutions."},
+  {name:"Aged Cheese", fa:"پنیر", hot:-1, wet:-2, digest:-2, nutri:1, humor:"bile-b", cat:"dairy-fat", note:"Cold and drying, especially when aged; classically paired with warming walnuts to offset its cold, dense nature."},
+  {name:"Egg Yolk", fa:"زرده تخم‌مرغ", hot:1, wet:1, digest:-1, nutri:2, humor:"blood", cat:"protein", note:"Warm and moist; considered a rich, strengthening food, especially for convalescents and children.", digestNote:"Classical sources describe the yolk as hot, highly nourishing, and difficult to digest. The one exception noted in the texts is a soft, half-boiled yolk specifically — held up as one of the single best examples of a food that is both light and highly nourishing at once."},
+  {name:"Egg White", fa:"سفیده تخم‌مرغ", hot:-1, wet:1, digest:0, nutri:-1, humor:"phlegm", cat:"protein", note:"Cooler and lighter than the yolk; traditionally applied topically to cool burns and inflammation as well as eaten.", digestNote:"Classical sources describe egg white as cold and viscous — notably less nourishing than the yolk, and not counted among the clearly \"light\" foods the way fruit or barley water are."},
+  {name:"Buttermilk (Doogh)", fa:"دوغ", hot:-1, wet:1, digest:2, nutri:-1, humor:"phlegm", cat:"dairy-fat", note:"Cold and moist; a traditional summer drink meant to cool the body and settle a heavy, oily meal."},
+  {name:"Beef", fa:"گوشت گاو", hot:2, wet:-1, digest:-2, nutri:2, humor:"bile-y", cat:"protein", note:"Warm and mildly drying; considered a denser, harder-to-digest meat than lamb, generating thicker blood.", digestNote:"Beef is the standard textbook example of a heavy, highly nutritious food in Unani dietetics — cited by name in multiple classical sources."},
+  {name:"Chicken", fa:"مرغ", hot:1, wet:1, digest:0, nutri:1, humor:"blood", cat:"protein", note:"Mildly warm and moist; considered lighter and easier to digest than red meat, suitable for most temperaments."},
+  {name:"Shrimp", fa:"میگو", hot:2, wet:1, digest:1, nutri:1, humor:"blood", cat:"protein", note:"Warm and moist; absorbed into coastal traditions as a rich, blood-nourishing seafood."},
+  {name:"Sugar", fa:"شکر", hot:1, wet:1, digest:2, nutri:1, humor:"blood", cat:"sweetener", note:"Mildly warm and moist; used both to sweeten and, in small doses, to gently open obstructions."},
+  {name:"Date Syrup", fa:"شیره خرما", hot:2, wet:1, digest:2, nutri:2, humor:"blood", cat:"sweetener", note:"Warm and moist, like the fruit it comes from; a traditional energy-restoring sweetener."},
+  {name:"Rock Candy (Nabat)", fa:"نبات", hot:1, wet:1, digest:2, nutri:1, humor:"blood", cat:"sweetener", note:"Mildly warm and moist; dissolved in hot herbal teas as a gentle way to soothe coughs and warm the chest."},
+  {name:"Black Tea", fa:"چای سیاه", hot:2, wet:-2, digest:2, nutri:-2, humor:"bile-y", cat:"beverage", note:"Warming and drying; a daily staple whose heat was traditionally tempered by drinking it with sugar or alongside cooling fruit."},
+  {name:"Green Tea", fa:"چای سبز", hot:-1, wet:-1, digest:2, nutri:-2, humor:"bile-b", cat:"beverage", note:"Considered cooler and drier than black tea in contemporary Persian herbal practice."},
+  {name:"Coffee", fa:"قهوه", hot:2, wet:-2, digest:2, nutri:-2, humor:"bile-y", cat:"beverage", note:"Hot and drying; used traditionally in small amounts to sharpen the mind, avoided by dry, choleric temperaments in excess."},
+  {name:"Chamomile", fa:"بابونه", hot:1, wet:-1, digest:2, nutri:-2, humor:"bile-y", cat:"beverage", note:"Mildly warming and drying; a gentle herbal tea used to calm digestion and ease sleeplessness."},
+  {name:"Licorice Root", fa:"شیرین‌بیان", hot:1, wet:2, digest:1, nutri:-1, humor:"blood", cat:"beverage", note:"Warm and moist; soothes the throat and chest and was traditionally used to harmonize other, harsher remedies."},
+  {name:"Rosewater", fa:"گلاب", hot:-1, wet:1, digest:2, nutri:-2, humor:"phlegm", cat:"beverage", note:"Cool and moist; used to calm the heart and mind and to balance heavier, hotter dishes."},
+  {name:"Tamarind", fa:"تمبر هندی", hot:-2, wet:-1, digest:1, nutri:-1, humor:"bile-b", cat:"condiment", note:"Cold and drying with a sharp sourness; used to cool bilious heat and cut through rich, fatty food."},
+  {name:"Thyme", fa:"آویشن", hot:3, wet:-2, digest:2, nutri:-2, humor:"bile-y", cat:"spice-herb", note:"Hot and drying; one of the most frequently cited corrective herbs in Persian home practice, added to cold, heavy, or dairy-rich foods to ease their digestion."},
+  {name:"Black Seed (Nigella)", fa:"سیاه‌دانه", hot:3, wet:-2, digest:1, nutri:-1, humor:"bile-y", cat:"spice-herb", note:"Hot and drying; famed in Islamic prophetic medicine as a remedy said to help almost any ailment, and a classic addition to yogurt or cheese to offset their cold, heavy nature."},
+  {name:"Ajwain (Carom Seed)", fa:"زنیان", hot:3, wet:-3, digest:2, nutri:-2, humor:"bile-y", cat:"spice-herb", note:"Strongly hot and drying; a staple addition to yogurt, doogh, and legumes across Persian kitchens to ease digestion and counter bloating."},
+  {name:"Golpar (Angelica)", fa:"گلپر", hot:2, wet:-2, digest:2, nutri:-2, humor:"bile-y", cat:"spice-herb", note:"Hot and drying with a bitter, resinous edge; a classic corrective sprinkled over fava beans, lentil soup, and sour pomegranate dishes."},
+  {name:"Savory", fa:"مرزه", hot:3, wet:-2, digest:2, nutri:-2, humor:"bile-y", cat:"spice-herb", note:"Hot and drying; used alongside lamb and other rich meats to aid their digestion."},
+  {name:"Pennyroyal", fa:"پونه", hot:2, wet:-2, digest:2, nutri:-2, humor:"bile-y", cat:"spice-herb", note:"Hot and drying; a traditional addition to yogurt and doogh, valued for settling the stomach and countering their cold nature."},
+  {name:"Black Caraway", fa:"زیره سیاه", hot:2, wet:-1, digest:2, nutri:-2, humor:"bile-y", cat:"spice-herb", note:"Warming and mildly drying, sharper than ordinary cumin; traditionally added to rice and other cold, heavy dishes."},
+  {name:"Bay Leaf", fa:"برگ بو", hot:2, wet:-2, digest:2, nutri:-2, humor:"bile-y", cat:"spice-herb", note:"Warming and drying; simmered into slow-cooked stews to aid digestion of heavier, colder ingredients."},
+  {name:"Nutmeg", fa:"جوز هندی", hot:3, wet:-2, digest:1, nutri:-1, humor:"bile-y", cat:"spice-herb", note:"Hot and drying; used sparingly to warm the stomach and aid digestion of fish and other rich foods."},
+  {name:"Rosemary", fa:"رزماری", hot:2, wet:-2, digest:2, nutri:-2, humor:"bile-y", cat:"spice-herb", note:"Warming and drying; traditionally regarded as strengthening for the memory and digestion."},
+  {name:"Fennel", fa:"رازیانه", hot:2, wet:-1, digest:2, nutri:-2, humor:"bile-y", cat:"spice-herb", note:"Warming and mildly drying; eases bloating and is a classic addition to barley dishes and bread."},
+  {name:"Salt", fa:"نمک", hot:1, wet:-1, digest:2, nutri:-2, humor:"bile-y", cat:"condiment", note:"Mildly warming and drying in traditional classification; used both to season and, in small amounts, as a corrective sprinkled over organ meats and cucumber."},
+  {name:"Turnip", fa:"شلغم", hot:1, wet:1, digest:1, nutri:-1, humor:"blood", cat:"vegetable", note:"Mildly warming and moist; a hearty root vegetable traditionally simmered into broths for cold, weak constitutions."},
+  {name:"Pumpkin", fa:"کدو حلوایی", hot:-2, wet:2, digest:1, nutri:0, humor:"phlegm", cat:"vegetable", note:"Cold and moist; a filling, easily digested squash traditionally recommended for hot, dry temperaments."},
+  {name:"Bell Pepper", fa:"فلفل دلمه‌ای", hot:1, wet:-1, digest:2, nutri:-2, humor:"bile-y", cat:"vegetable", note:"Mildly warming and drying; a much milder relative of hot peppers, absorbed into the tradition's warming vegetable family."},
+  {name:"Green Beans", fa:"لوبیا سبز", hot:-1, wet:1, digest:1, nutri:-1, humor:"phlegm", cat:"vegetable", note:"Mildly cold and moist; lighter than dried beans, but still traditionally paired with warming spices to ease digestion."},
+  {name:"Artichoke", fa:"کنگر", hot:2, wet:-2, digest:0, nutri:-1, humor:"bile-y", cat:"vegetable", note:"Warming and drying; traditionally used to stimulate the liver and aid digestion of rich food."},
+  {name:"Asparagus", fa:"مارچوبه", hot:2, wet:-1, digest:1, nutri:-1, humor:"bile-y", cat:"vegetable", note:"Warming and mildly drying; traditionally valued as a diuretic and digestive stimulant."},
+  {name:"Arugula", fa:"جرجیر", hot:2, wet:-2, digest:2, nutri:-2, humor:"bile-y", cat:"vegetable", note:"Warming and drying; a peppery salad green traditionally used to stimulate digestion and the appetite."},
+  {name:"Watercress", fa:"شاهی", hot:2, wet:-2, digest:2, nutri:-2, humor:"bile-y", cat:"vegetable", note:"Warming and drying; a peppery, mineral-rich green traditionally used to clear congestion and stimulate circulation."},
+  {name:"Sweet Potato", fa:"سیب‌زمینی شیرین", hot:1, wet:1, digest:0, nutri:1, humor:"blood", cat:"vegetable", note:"Mildly warming and moist; a nourishing root vegetable, warmer in classification than the common potato."},
+  {name:"Scallion", fa:"پیازچه", hot:2, wet:1, digest:1, nutri:-2, humor:"blood", cat:"vegetable", note:"Warming and moist, milder than the mature onion; eaten fresh to stimulate appetite and digestion."},
+  {name:"Broad Beans", fa:"باقلا", hot:-1, wet:-1, digest:-2, nutri:1, humor:"bile-b", cat:"grain-legume", note:"Cold and drying; traditionally considered heavy and gas-producing, and almost always cooked with warming herbs and spices to offset this."},
+  {name:"Persimmon", fa:"خرمالو", hot:-1, wet:-1, digest:1, nutri:-1, humor:"bile-b", cat:"fruit", note:"Cold and drying with an astringent edge; traditionally used to settle the stomach and ease diarrhea."},
+  {name:"Kiwi", fa:"کیوی", hot:-1, wet:1, digest:2, nutri:-2, humor:"phlegm", cat:"fruit", note:"Mildly cold and moist; a more recently arrived fruit absorbed into the living tradition as a cooling, vitamin-rich food."},
+  {name:"Pineapple", fa:"آناناس", hot:1, wet:1, digest:1, nutri:-1, humor:"blood", cat:"fruit", note:"Warm and moist; a tropical fruit absorbed into the tradition as a rich, digestion-aiding food."},
+  {name:"Strawberry", fa:"توت فرنگی", hot:-1, wet:1, digest:2, nutri:-2, humor:"phlegm", cat:"fruit", note:"Mildly cold and moist; a cooling, refreshing summer fruit."},
+  {name:"Jujube", fa:"عناب", hot:-1, wet:1, digest:1, nutri:-1, humor:"phlegm", cat:"fruit", note:"Cold and moist; a classic remedy for coughs and sore throats, often simmered into a soothing syrup."},
+  {name:"Zereshk (Barberry)", fa:"زرشک", hot:-2, wet:-2, digest:2, nutri:-2, humor:"bile-b", cat:"fruit", note:"Cold and notably drying with a sharp sourness; used to cut the richness of rice dishes and cool bilious heat."},
+  {name:"Sour Green Plum", fa:"گوجه سبز", hot:-2, wet:-1, digest:2, nutri:-2, humor:"bile-b", cat:"fruit", note:"Cold and drying with an intense sourness; eaten as a palate-cleansing snack, and craved in early pregnancy according to folk belief."},
+  {name:"Rhubarb", fa:"ریواس", hot:-2, wet:-1, digest:1, nutri:-2, humor:"bile-b", cat:"fruit", note:"Cold and drying with a tart sourness; traditionally cooked with sugar and used to cool the blood and stimulate a sluggish liver."},
+  {name:"Chestnut", fa:"شاه‌بلوط", hot:1, wet:1, digest:0, nutri:1, humor:"blood", cat:"nut-seed", note:"Warm and moist; a hearty roasted nut traditionally eaten in cold weather to build strength."},
+  {name:"Flaxseed", fa:"تخم کتان", hot:1, wet:1, digest:1, nutri:0, humor:"blood", cat:"nut-seed", note:"Warm and moist; its mucilage was traditionally used to soothe an irritated, dry digestive tract."},
+  {name:"Verjuice", fa:"آبغوره", hot:-2, wet:-2, digest:2, nutri:-2, humor:"bile-b", cat:"condiment", note:"Cold and notably drying; the sour juice of unripe grapes, used exactly like vinegar or lemon to cool and lighten heavy, hot dishes."},
+  {name:"Pomegranate Molasses", fa:"رب انار", hot:-2, wet:-2, digest:1, nutri:-1, humor:"bile-b", cat:"condiment", note:"Cold and drying; a concentrated souring agent used to balance rich stews and rice dishes."},
+  {name:"Sekanjabin", fa:"سکنجبین", hot:-1, wet:-1, digest:1, nutri:-1, humor:"bile-b", cat:"condiment", note:"A classic vinegar-and-honey syrup — cold-leaning overall since the vinegar dominates honey's heat — traditionally sipped to cool the body, and used as a mosleh for hot, dry foods like lettuce."}
+];
+
+/* ---------------------------------------------------------
+   TRANSLATIONS
+--------------------------------------------------------- */
+const STRINGS = {
+  en:{
+    brandSub:"Traditional Food Temperament Tracker",
+    h1:"Know your food's temperament",
+    lede:"In Perso-Islamic traditional medicine, every food carries a <b>mizāj</b> — a temperament positioned along hot↔cold and moist↔dry — systematized by Ibn Sīnā in the <i>Canon of Medicine</i>. Search, filter, and build a plate to see how it balances.",
+    statIngredients:"Ingredients tracked", statCategories:"Categories", statHumors:"Humors", statDegrees:"Degree scale",
+    sec1title:"The four humors", sec1sub:"Tap a humor to filter the database below.",
+    h_blood_name:"Blood — Dam", h_blood_qual:"Hot & Wet · Sanguine",
+    h_blood_desc:"Vitality and circulation. Said to bring warmth, colour, and good cheer.",
+    h_biley_name:"Yellow Bile — Ṣafrā", h_biley_qual:"Hot & Dry · Choleric",
+    h_biley_desc:"Digestion and metabolic heat. Quick and driven, prone to irritability in excess.",
+    h_bileb_name:"Black Bile — Saudā", h_bileb_qual:"Cold & Dry · Melancholic",
+    h_bileb_desc:"Structure and restraint. Deliberate and retentive, prone to gloom in excess.",
+    h_phlegm_name:"Phlegm — Balgham", h_phlegm_qual:"Cold & Wet · Phlegmatic",
+    h_phlegm_desc:"Lubrication and cooling. Calm and steady, prone to sluggishness in excess.",
+    sec3title:"Explore ingredients", sec3sub:"Search, filter by category or humor, or switch to the compass view.",
+    viewGrid:"▦ Grid", viewCompass:"◎ Compass",
+    searchPlaceholder:"Search an ingredient…",
+    sortName:"Sort: Name", sortHot:"Sort: Hottest first", sortCold:"Sort: Coldest first", sortWet:"Sort: Moistest first", sortDry:"Sort: Driest first",
+    chipAllHumor:"All humors",
+    chipAllCat:"All categories",
+    cat_fruit:"Fruit", cat_vegetable:"Vegetable", cat_grain_legume:"Grain & Legume", cat_protein:"Protein",
+    cat_dairy_fat:"Dairy & Fat", cat_nut_seed:"Nut & Seed", cat_spice_herb:"Spice & Herb", cat_sweetener:"Sweetener",
+    cat_beverage:"Beverage", cat_condiment:"Condiment",
+    legendBlood:"Blood (Dam)", legendBileY:"Yellow Bile (Ṣafrā)", legendBileB:"Black Bile (Saudā)", legendPhlegm:"Phlegm (Balgham)",
+    tempSanguine:"Sanguine", tempCholeric:"Choleric", tempMelancholic:"Melancholic", tempPhlegmatic:"Phlegmatic",
+    filterHint:"filter",
+    hotWord:"Hot", coldWord:"Cold", moistWord:"Moist", dryWord:"Dry",
+    temperamentSuffix:" temperament",
+    axisWET:"WET", axisDRY:"DRY", axisCOLD:"COLD", axisHOT:"HOT",
+    qBlood:"BLOOD", qBileY:"YELLOW BILE", qBileB:"BLACK BILE", qPhlegm:"PHLEGM",
+    wheelSideTitle:"Read the compass",
+    wheelSideP:"Distance from the center marks intensity — 1st degree near the middle, 4th near the rim. Click any point, or a humor below, to explore.",
+    modeMizaj:"Mizāj", modeDigest:"Digestibility",
+    digestSideTitle:"Read the digestibility map",
+    digestSideP:"A separate classical framework from mizāj: how easily a food digests (light ↔ heavy) crossed with how much it nourishes (low ↔ high density). Foods can be light yet very nourishing, or heavy yet weakly nourishing — the two axes are genuinely independent.",
+    axisLIGHT:"LIGHT", axisHEAVY:"HEAVY", axisHIGHNUTRI:"HIGH DENSITY", axisLOWNUTRI:"LOW DENSITY",
+    qEfficient:"EFFICIENT", qCleansing:"CLEANSING", qHearty:"HEARTY", qTaxing:"TAXING",
+    legendEfficient:"Efficient", legendCleansing:"Cleansing", legendHearty:"Hearty", legendTaxing:"Taxing",
+    digestEfficientDesc:"Light & highly nourishing",
+    digestCleansingDesc:"Light & low nutritive density",
+    digestHeartyDesc:"Heavy & highly nourishing",
+    digestTaxingDesc:"Heavy & low nutritive density",
+    digestLabel:"Digestibility", lightWord:"Light", heavyWord:"Heavy", highNutriWord:"High-density", lowNutriWord:"Low-density",
+    drawerDigestCaption:"On digestibility, <b>{name}</b> is {digestLabel} and {nutriLabel} — traditionally classed as {quadName}.",
+    emptyMsg:"No ingredients match — try another search or filter.",
+    addToPlate:"Add to plate", removeFromPlate:"Remove from plate", addedToPlate:"✓ Added",
+    footer1:"<b>On these classifications:</b> degrees and humor associations reflect the broad, long-standing Perso-Islamic (Unani/Tibb) tradition descending from Ibn Sīnā's <i>Canon of Medicine</i>, compiled across historical and contemporary sources — including common New World foods absorbed into living practice. Individual texts and regional traditions sometimes disagree on an exact degree; treat these as representative, not a single authoritative verdict.",
+    footer2:"This is a historical and educational reference, not medical advice.",
+    noteLangHint:"This ingredient's historical note is currently only available in English.",
+    compassSectionCaption:"This is where <b>{name}</b> sits on the mizāj compass — {hotLabel} {hotDeg}°, {wetLabel} {wetDeg}°.",
+    moslehTitle:"Complementary Foods (Moṣleḥ)",
+    moslehNoteTraditional:"A traditional corrective pairing — eaten together, these are said to offset {name}'s effect on the body.",
+    moslehNoteGeneric:"These foods sit in the opposite temperament and are traditionally used to help restore balance after {name}.",
+    trayLabel:"View plate balance",
+    modalTitle:"Your Plate Balance",
+    emptyPlate:"Add ingredients from the grid or compass to see your plate's overall temperament balance.",
+    suggestTitle:"Suggested to balance",
+    clearPlate:"Clear plate",
+    verdictBalancedTitle:"Balanced",
+    verdictBalanced:"Your plate sits close to the center — a balanced mizāj by traditional reckoning.",
+    verdictBloodTitle:"Leans Blood (Hot & Wet)",
+    verdictBlood:"Traditionally thought to build vitality and good cheer, but can run rich. Consider adding something cool and dry.",
+    verdictBileYTitle:"Leans Yellow Bile (Hot & Dry)",
+    verdictBileY:"Traditionally linked to quick energy and sharp digestion, but can tip toward irritability or dryness. Consider adding something cool and moist.",
+    verdictBileBTitle:"Leans Black Bile (Cold & Dry)",
+    verdictBileB:"Traditionally associated with structure and restraint, but can feel heavy if unbalanced. Consider adding something warm and moist.",
+    verdictPhlegmTitle:"Leans Phlegm (Cold & Wet)",
+    verdictPhlegm:"Traditionally linked to calm and lubrication, but can feel sluggish if unbalanced. Consider adding something warm and dry."
+  },
+  fa:{
+    brandSub:"ردیاب مزاج غذایی سنتی",
+    h1:"مزاج غذایتان را بشناسید",
+    lede:"در طب سنتی ایرانی-اسلامی، هر غذا <b>مزاجی</b> دارد — جایگاهی میان گرمی↔سردی و رطوبت↔خشکی — که ابن سینا آن را در <i>قانون در طب</i> نظام‌مند کرد. جستجو کنید، پالایش کنید و بشقاب خود را بسازید تا تعادل آن را ببینید.",
+    statIngredients:"ماده غذایی ثبت‌شده", statCategories:"دسته‌بندی", statHumors:"خلط", statDegrees:"مقیاس درجه",
+    sec1title:"چهار خلط", sec1sub:"برای پالایش پایگاه داده، روی یک خلط بزنید.",
+    h_blood_name:"خون — دَم", h_blood_qual:"گرم و تر · دموی",
+    h_blood_desc:"نشاط و گردش خون. گفته می‌شد گرما، طراوت و شادابی به همراه دارد.",
+    h_biley_name:"صفرا", h_biley_qual:"گرم و خشک · صفراوی",
+    h_biley_desc:"گوارش و گرمای متابولیک. تند و پرانرژی، و در افراط، زودخشم.",
+    h_bileb_name:"سودا", h_bileb_qual:"سرد و خشک · سوداوی",
+    h_bileb_desc:"استحکام و خویشتن‌داری. متین و نگهدارنده، و در افراط، مستعد افسردگی.",
+    h_phlegm_name:"بلغم", h_phlegm_qual:"سرد و تر · بلغمی",
+    h_phlegm_desc:"روان‌سازی و خنک‌سازی. آرام و باثبات، و در افراط، مستعد کندی.",
+    sec3title:"مرور مواد غذایی", sec3sub:"جستجو کنید، بر اساس دسته یا خلط پالایش کنید، یا به نمای قطب‌نما بروید.",
+    viewGrid:"▦ شبکه", viewCompass:"◎ قطب‌نما",
+    searchPlaceholder:"جستجوی یک ماده غذایی…",
+    sortName:"مرتب‌سازی: نام", sortHot:"مرتب‌سازی: گرم‌ترین", sortCold:"مرتب‌سازی: سردترین", sortWet:"مرتب‌سازی: مرطوب‌ترین", sortDry:"مرتب‌سازی: خشک‌ترین",
+    chipAllHumor:"همه خلط‌ها",
+    chipAllCat:"همه دسته‌ها",
+    cat_fruit:"میوه", cat_vegetable:"سبزی", cat_grain_legume:"غلات و حبوبات", cat_protein:"پروتئین",
+    cat_dairy_fat:"لبنیات و چربی", cat_nut_seed:"آجیل و دانه", cat_spice_herb:"ادویه و گیاه", cat_sweetener:"شیرین‌کننده",
+    cat_beverage:"نوشیدنی", cat_condiment:"چاشنی",
+    legendBlood:"خون (دَم)", legendBileY:"صفرا", legendBileB:"سودا", legendPhlegm:"بلغم",
+    tempSanguine:"دموی", tempCholeric:"صفراوی", tempMelancholic:"سوداوی", tempPhlegmatic:"بلغمی",
+    filterHint:"پالایش",
+    hotWord:"گرم", coldWord:"سرد", moistWord:"تر", dryWord:"خشک",
+    temperamentSuffix:" مزاج",
+    axisWET:"تر", axisDRY:"خشک", axisCOLD:"سرد", axisHOT:"گرم",
+    qBlood:"خون", qBileY:"صفرا", qBileB:"سودا", qPhlegm:"بلغم",
+    wheelSideTitle:"خواندن قطب‌نما",
+    wheelSideP:"فاصله از مرکز نشان‌دهنده شدت است — درجه یک نزدیک مرکز، درجه چهار نزدیک لبه. روی هر نقطه یا هر خلط در پایین کلیک کنید.",
+    modeMizaj:"مزاج", modeDigest:"قابلیت هضم",
+    digestSideTitle:"خواندن نقشه قابلیت هضم",
+    digestSideP:"چارچوبی جدا از مزاج: میزان سهولت هضم یک غذا (سبک ↔ سنگین) در برابر میزان تغذیه‌بخشی آن (کم‌چگالی ↔ پرچگالی). یک غذا می‌تواند سبک اما بسیار مغذی باشد، یا سنگین اما کم‌مغذی — این دو محور واقعاً مستقل‌اند.",
+    axisLIGHT:"سبک", axisHEAVY:"سنگین", axisHIGHNUTRI:"پرچگالی", axisLOWNUTRI:"کم‌چگالی",
+    qEfficient:"کارآمد", qCleansing:"پاک‌کننده", qHearty:"مقوی", qTaxing:"سنگین‌وکم‌بازده",
+    legendEfficient:"کارآمد", legendCleansing:"پاک‌کننده", legendHearty:"مقوی", legendTaxing:"سنگین و کم‌بازده",
+    digestEfficientDesc:"سبک و بسیار مغذی",
+    digestCleansingDesc:"سبک و کم‌چگالی از نظر تغذیه",
+    digestHeartyDesc:"سنگین و بسیار مغذی",
+    digestTaxingDesc:"سنگین و کم‌چگالی از نظر تغذیه",
+    digestLabel:"قابلیت هضم", lightWord:"سبک", heavyWord:"سنگین", highNutriWord:"پرچگالی", lowNutriWord:"کم‌چگالی",
+    drawerDigestCaption:"از نظر قابلیت هضم، <b>{name}</b> {digestLabel} و {nutriLabel} است — به‌طور سنتی در دسته {quadName} قرار می‌گیرد.",
+    emptyMsg:"هیچ ماده‌ای یافت نشد — عبارت یا پالایش دیگری را امتحان کنید.",
+    addToPlate:"افزودن به بشقاب", removeFromPlate:"حذف از بشقاب", addedToPlate:"✓ افزوده شد",
+    footer1:"<b>درباره این دسته‌بندی‌ها:</b> درجه‌ها و ارتباط با اخلاط، سنت گسترده و دیرینه ایرانی-اسلامی (طب سنتی) برگرفته از <i>قانون در طب</i> ابن سینا را نشان می‌دهند که از منابع تاریخی و معاصر گردآوری شده — از جمله غذاهای دنیای جدید که در عمل زنده جای گرفته‌اند. متون گوناگون گاه در درجه دقیق یک ماده اختلاف دارند؛ این‌ها را نماینده بدانید، نه حکمی واحد.",
+    footer2:"این یک منبع تاریخی و آموزشی است، نه توصیه پزشکی.",
+    noteLangHint:"توضیح تاریخی این ماده در حال حاضر تنها به انگلیسی موجود است.",
+    compassSectionCaption:"جایگاه <b>{name}</b> در قطب‌نمای مزاج — {hotLabel} {hotDeg}°، {wetLabel} {wetDeg}°.",
+    moslehTitle:"غذاهای مکمل (مصلح)",
+    moslehNoteTraditional:"یک ترکیب اصلاحی سنتی — گفته می‌شود این‌ها در کنار {name} اثر آن را تعدیل می‌کنند.",
+    moslehNoteGeneric:"این مواد در مزاج مخالف قرار دارند و به‌طور سنتی برای بازگرداندن تعادل پس از مصرف {name} استفاده می‌شوند.",
+    trayLabel:"مشاهده تعادل بشقاب",
+    modalTitle:"تعادل بشقاب شما",
+    emptyPlate:"مواد غذایی را از شبکه یا قطب‌نما اضافه کنید تا تعادل کلی مزاج بشقاب خود را ببینید.",
+    suggestTitle:"پیشنهاد برای تعادل",
+    clearPlate:"خالی کردن بشقاب",
+    verdictBalancedTitle:"متعادل",
+    verdictBalanced:"بشقاب شما نزدیک به مرکز است — مزاجی متعادل بر اساس سنجش سنتی.",
+    verdictBloodTitle:"گرایش به خون (گرم و تر)",
+    verdictBlood:"سنتاً باور بر این بود که نشاط و شادابی می‌سازد، اما ممکن است زیاده باشد. چیزی سرد و خشک اضافه کنید.",
+    verdictBileYTitle:"گرایش به صفرا (گرم و خشک)",
+    verdictBileY:"سنتاً به انرژی سریع و گوارش تیز پیوند داشت، اما ممکن است به زودخشمی یا خشکی برسد. چیزی سرد و تر اضافه کنید.",
+    verdictBileBTitle:"گرایش به سودا (سرد و خشک)",
+    verdictBileB:"سنتاً با استحکام و خویشتن‌داری همراه بود، اما اگر نامتعادل شود می‌تواند سنگین باشد. چیزی گرم و تر اضافه کنید.",
+    verdictPhlegmTitle:"گرایش به بلغم (سرد و تر)",
+    verdictPhlegm:"سنتاً به آرامش و روان‌سازی پیوند داشت، اما اگر نامتعادل شود می‌تواند کندی بیاورد. چیزی گرم و خشک اضافه کنید."
+  }
+};
+
+const CATS = ['fruit','vegetable','grain-legume','protein','dairy-fat','nut-seed','spice-herb','sweetener','beverage','condiment'];
+const CAT_KEY = { 'fruit':'cat_fruit','vegetable':'cat_vegetable','grain-legume':'cat_grain_legume','protein':'cat_protein',
+  'dairy-fat':'cat_dairy_fat','nut-seed':'cat_nut_seed','spice-herb':'cat_spice_herb','sweetener':'cat_sweetener',
+  'beverage':'cat_beverage','condiment':'cat_condiment' };
+const HUMOR_META_KEY = { 'blood':{label:'legendBlood', temp:'tempSanguine'}, 'bile-y':{label:'legendBileY', temp:'tempCholeric'},
+  'bile-b':{label:'legendBileB', temp:'tempMelancholic'}, 'phlegm':{label:'legendPhlegm', temp:'tempPhlegmatic'} };
+
+/* ---------------------------------------------------------
+   MOSLEH (traditional corrective pairings)
+   Sourced from cross-referenced Persian traditional-medicine
+   home-health references (multiple independent listings agree
+   on these specific pairings). Each entry: names of ingredients
+   (matched against FOODS by name) traditionally eaten alongside
+   the food to offset its extremes. Ingredients without a
+   confirmed override fall back to an algorithmic suggestion
+   (opposite-humor foods with the strongest degrees).
+--------------------------------------------------------- */
+const MOSLEH_OVERRIDES = {
+  "Aged Cheese": ["Walnuts", "Black Seed (Nigella)", "Thyme"],
+  "Yogurt": ["Fresh Mint", "Dried Ginger", "Garlic", "Thyme", "Ajwain (Carom Seed)", "Pennyroyal", "Black Seed (Nigella)"],
+  "Buttermilk (Doogh)": ["Fresh Mint", "Pennyroyal"],
+  "White Fish": ["Walnuts", "Black Pepper", "Dates"],
+  "Rice": ["Cumin", "Saffron", "Dill", "Black Caraway"],
+  "Lamb": ["Sumac", "Honey", "Cilantro"],
+  "Beef": ["Sumac", "Cilantro"],
+  "Cucumber": ["Fresh Mint", "Rosewater"],
+  "Lettuce": ["Cumin", "Celery", "Sekanjabin"],
+  "Barley": ["Cumin", "Fennel", "Verjuice"],
+  "Lentils": ["Golpar (Angelica)", "Thyme"],
+  "Broad Beans": ["Golpar (Angelica)", "Pennyroyal", "Cinnamon", "Thyme", "Cumin", "Black Pepper"],
+  "Green Beans": ["Cinnamon", "Dried Ginger", "Mustard Seed", "Olive Oil", "Thyme"],
+  "Olive Oil": ["Honey", "Vinegar", "Fresh Lime"],
+  "Butter": ["Honey"],
+  "Milk (cow)": ["Rosewater", "Cardamom", "Honey"],
+  "Egg Yolk": ["Cinnamon", "Onion", "Black Pepper", "Dill"],
+  "Egg White": ["Cinnamon", "Onion", "Black Pepper", "Dill"],
+  "Chickpeas": ["Cinnamon", "Dried Ginger", "Mustard Seed", "Olive Oil", "Thyme"],
+  "Mung Beans": ["Cinnamon", "Dried Ginger", "Mustard Seed", "Olive Oil", "Thyme"],
+  "Black Tea": ["Fresh Lime", "Dried Ginger", "Cinnamon"],
+  "Sesame Seeds": ["Honey"],
+  "Wheat": ["Sesame Seeds"],
+  "Mushroom": ["Black Pepper", "Mustard Seed"],
+  "Garlic": ["Yogurt"],
+  "Onion": ["Yogurt", "Vinegar"],
+  "Eggplant": ["Yogurt"],
+  "Watermelon": ["Dates"],
+  "Melon": ["Dates"],
+  "Coffee": ["Rock Candy (Nabat)", "Milk (cow)"]
+};
+
+function getMosleh(f){
+  const override = MOSLEH_OVERRIDES[f.name];
+  if(override){
+    const list = override.map(n => FOODS.findIndex(x => x.name===n)).filter(i => i>=0);
+    return { indices:list, traditional:true };
+  }
+  const oppMap = { 'blood':'bile-b', 'bile-y':'phlegm', 'bile-b':'blood', 'phlegm':'bile-y' };
+  const opp = oppMap[f.humor];
+  const list = FOODS
+    .map((x, idx)=>({...x, idx}))
+    .filter(x => x.humor===opp && x.name!==f.name)
+    .sort((a,b)=> (Math.abs(b.hot)+Math.abs(b.wet)) - (Math.abs(a.hot)+Math.abs(a.wet)))
+    .slice(0,4)
+    .map(x => x.idx);
+  return { indices:list, traditional:false };
+}
+
+/* ---------------------------------------------------------
+   STATE
+--------------------------------------------------------- */
+let LANG = 'en';
+let humorFilter = 'all';
+let catFilter = 'all';
+let currentView = 'grid';
+let compassMode = 'mizaj'; // 'mizaj' | 'digest'
+let digestQuadFilter = null;
+let activeDetailIdx = null;
+let plate = []; // array of indices into FOODS
+
+function t(key){ return (STRINGS[LANG] && STRINGS[LANG][key]) || STRINGS.en[key] || key; }
+function toPersianDigits(str){
+  if(LANG!=='fa') return String(str);
+  const map = {'0':'۰','1':'۱','2':'۲','3':'۳','4':'۴','5':'۵','6':'۶','7':'۷','8':'۸','9':'۹','.':'.','-':'-'};
+  return String(str).split('').map(ch=>map[ch]!==undefined?map[ch]:ch).join('');
+}
+
+/* ---------------------------------------------------------
+   COMPASS
+--------------------------------------------------------- */
+const svgNS = "http://www.w3.org/2000/svg";
+const CX = 220, CY = 220, R = 180;
+
+const MIZAJ_ICONS = { blood:'🩸', 'bile-y':'⚡', 'bile-b':'🌙', phlegm:'💧' };
+const DIGEST_ICONS = { efficient:'✨', cleansing:'🌿', hearty:'💪', taxing:'🐢' };
+
+function buildWheel(){
+  if(compassMode==='digest') buildDigestWheel(); else buildMizajWheel();
+}
+
+/* --- circular-wedge quadrant helpers (Cartesian: right/up = positive) --- */
+function polarPt(cx,cy,r,angleDeg){
+  const rad = angleDeg * Math.PI/180;
+  return [cx + r*Math.cos(rad), cy - r*Math.sin(rad)];
+}
+function wedgePath(cx,cy,r,startDeg,endDeg){
+  const [x1,y1] = polarPt(cx,cy,r,startDeg);
+  const [x2,y2] = polarPt(cx,cy,r,endDeg);
+  return `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 0 0 ${x2} ${y2} Z`;
+}
+// order matches [topRight, bottomRight, bottomLeft, topLeft]
+const QUAD_RANGES = [[0,90],[270,360],[180,270],[90,180]];
+
+function drawQuadrantWedges(svg, cx, cy, r, colors, icons, iconOpacity){
+  QUAD_RANGES.forEach((range, i)=>{
+    const path = document.createElementNS(svgNS,'path');
+    path.setAttribute('d', wedgePath(cx,cy,r,range[0],range[1]));
+    path.setAttribute('fill', colors[i]);
+    path.setAttribute('opacity','0.16');
+    svg.appendChild(path);
+  });
+  if(icons){
+    QUAD_RANGES.forEach((range,i)=>{
+      const mid = (range[0]+range[1])/2;
+      const [ex,ey] = polarPt(cx,cy,r*0.52,mid);
+      const text = document.createElementNS(svgNS,'text');
+      text.setAttribute('x', ex); text.setAttribute('y', ey);
+      text.setAttribute('text-anchor','middle');
+      text.setAttribute('dominant-baseline','central');
+      text.setAttribute('font-size', Math.round(r*0.36));
+      text.setAttribute('opacity', iconOpacity||'0.24');
+      text.style.pointerEvents = 'none';
+      text.textContent = icons[i];
+      svg.appendChild(text);
+    });
+  }
+  const circle = document.createElementNS(svgNS,'circle');
+  circle.setAttribute('cx',cx); circle.setAttribute('cy',cy); circle.setAttribute('r',r);
+  circle.setAttribute('fill','none'); circle.setAttribute('stroke','#CBD0E3'); circle.setAttribute('stroke-width','1.6');
+  svg.appendChild(circle);
+}
+
+function drawCompassChrome(svg, cx, cy, r, withArrows){
+  [1,2,3].forEach(d=>{
+    const c = document.createElementNS(svgNS,'circle');
+    c.setAttribute('cx',cx); c.setAttribute('cy',cy); c.setAttribute('r', (d/4)*r);
+    c.setAttribute('fill','none');
+    c.setAttribute('stroke', '#FFFFFF');
+    c.setAttribute('stroke-width', 1);
+    c.setAttribute('stroke-dasharray', '3,4');
+    c.setAttribute('opacity','0.65');
+    svg.appendChild(c);
+  });
+  [
+    {x1:cx-r,y1:cy,x2:cx+r,y2:cy},
+    {x1:cx,y1:cy+r,x2:cx,y2:cy-r},
+  ].forEach(l=>{
+    const line = document.createElementNS(svgNS,'line');
+    line.setAttribute('x1',l.x1);line.setAttribute('y1',l.y1);line.setAttribute('x2',l.x2);line.setAttribute('y2',l.y2);
+    line.setAttribute('stroke','#FFFFFF'); line.setAttribute('stroke-width','1.6'); line.setAttribute('opacity','0.9');
+    svg.appendChild(line);
+  });
+  if(withArrows){
+    const mkArrow = (tipX,tipY,angleDeg)=>{
+      const size=6, rad=angleDeg*Math.PI/180, perp=(angleDeg+90)*Math.PI/180;
+      const backX = tipX - size*1.7*Math.cos(rad), backY = tipY + size*1.7*Math.sin(rad);
+      const p2x = backX + size*Math.cos(perp), p2y = backY - size*Math.sin(perp);
+      const p3x = backX - size*Math.cos(perp), p3y = backY + size*Math.sin(perp);
+      const poly = document.createElementNS(svgNS,'polygon');
+      poly.setAttribute('points', `${tipX},${tipY} ${p2x},${p2y} ${p3x},${p3y}`);
+      poly.setAttribute('fill','#FFFFFF'); poly.setAttribute('opacity','0.9');
+      svg.appendChild(poly);
+    };
+    mkArrow(cx+r, cy, 0);
+    mkArrow(cx, cy-r, 90);
+  }
+}
+
+function buildMizajWheel(){
+  const svg = document.getElementById('wheel');
+  svg.innerHTML = '';
+  const colors = [HUMORS['blood'].color, HUMORS['bile-y'].color, HUMORS['bile-b'].color, HUMORS['phlegm'].color];
+  const icons = [MIZAJ_ICONS.blood, MIZAJ_ICONS['bile-y'], MIZAJ_ICONS['bile-b'], MIZAJ_ICONS.phlegm];
+  drawQuadrantWedges(svg, CX, CY, R, colors, icons);
+  drawCompassChrome(svg, CX, CY, R, true);
+  const labels = [
+    {x:CX, y:CY-R-10, key:'axisWET', a:'middle'},
+    {x:CX, y:CY+R+18, key:'axisDRY', a:'middle'},
+    {x:CX-R-8, y:CY+4, key:'axisCOLD', a:'end'},
+    {x:CX+R+8, y:CY+4, key:'axisHOT', a:'start'},
+  ];
+  labels.forEach(l=>{
+    const txt = document.createElementNS(svgNS,'text');
+    txt.setAttribute('x',l.x); txt.setAttribute('y',l.y);
+    txt.setAttribute('text-anchor', l.a);
+    txt.setAttribute('font-family', "'Plus Jakarta Sans', sans-serif");
+    txt.setAttribute('font-size','11'); txt.setAttribute('font-weight','800');
+    txt.setAttribute('letter-spacing','1');
+    txt.setAttribute('fill','#9BA0B4');
+    txt.textContent = t(l.key);
+    svg.appendChild(txt);
+  });
+  const qLabels = [
+    {x:CX+R*0.68, y:CY-R*0.72, key:'qBlood', humor:'blood'},
+    {x:CX+R*0.68, y:CY+R*0.74, key:'qBileY', humor:'bile-y'},
+    {x:CX-R*0.68, y:CY+R*0.74, key:'qBileB', humor:'bile-b'},
+    {x:CX-R*0.68, y:CY-R*0.72, key:'qPhlegm', humor:'phlegm'},
+  ];
+  qLabels.forEach(q=>{
+    const txt = document.createElementNS(svgNS,'text');
+    txt.setAttribute('x',q.x); txt.setAttribute('y',q.y);
+    txt.setAttribute('text-anchor','middle');
+    txt.setAttribute('font-family', "'Plus Jakarta Sans', sans-serif");
+    txt.setAttribute('font-size','9.5'); txt.setAttribute('font-weight','800');
+    txt.setAttribute('fill', HUMORS[q.humor].color);
+    txt.setAttribute('opacity','0.75');
+    txt.textContent = t(q.key);
+    svg.appendChild(txt);
+  });
+
+  const filtered = getFilteredIndices();
+  FOODS.forEach((f, idx)=>{
+    const x = CX + (f.hot/4)*R;
+    const y = CY - (f.wet/4)*R;
+    const c = document.createElementNS(svgNS,'circle');
+    c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', 5.5);
+    c.setAttribute('fill', HUMORS[f.humor].color);
+    c.setAttribute('stroke', '#fff'); c.setAttribute('stroke-width', '1.5');
+    c.setAttribute('class','wheel-point');
+    if(!filtered.has(idx)) c.classList.add('dim');
+    c.dataset.idx = idx;
+    c.addEventListener('click', ()=> showDetail(idx));
+    c.addEventListener('mouseenter', (e)=> showTooltip(e, f.name));
+    c.addEventListener('mousemove', (e)=> moveTooltip(e));
+    c.addEventListener('mouseleave', hideTooltip);
+    svg.appendChild(c);
+  });
+}
+
+function buildDigestWheel(){
+  const svg = document.getElementById('wheel');
+  svg.innerHTML = '';
+  const colors = [DIGEST_QUAD.efficient.color, DIGEST_QUAD.cleansing.color, DIGEST_QUAD.taxing.color, DIGEST_QUAD.hearty.color];
+  const icons = [DIGEST_ICONS.efficient, DIGEST_ICONS.cleansing, DIGEST_ICONS.taxing, DIGEST_ICONS.hearty];
+  drawQuadrantWedges(svg, CX, CY, R, colors, icons);
+  drawCompassChrome(svg, CX, CY, R, true);
+  const labels = [
+    {x:CX, y:CY-R-10, key:'axisHIGHNUTRI', a:'middle'},
+    {x:CX, y:CY+R+18, key:'axisLOWNUTRI', a:'middle'},
+    {x:CX-R-8, y:CY+4, key:'axisHEAVY', a:'end'},
+    {x:CX+R+8, y:CY+4, key:'axisLIGHT', a:'start'},
+  ];
+  labels.forEach(l=>{
+    const txt = document.createElementNS(svgNS,'text');
+    txt.setAttribute('x',l.x); txt.setAttribute('y',l.y);
+    txt.setAttribute('text-anchor', l.a);
+    txt.setAttribute('font-family', "'Plus Jakarta Sans', sans-serif");
+    txt.setAttribute('font-size','11'); txt.setAttribute('font-weight','800');
+    txt.setAttribute('letter-spacing','1');
+    txt.setAttribute('fill','#9BA0B4');
+    txt.textContent = t(l.key);
+    svg.appendChild(txt);
+  });
+  const qLabels = [
+    {x:CX+R*0.68, y:CY-R*0.72, key:'qEfficient', quad:'efficient'},
+    {x:CX+R*0.68, y:CY+R*0.74, key:'qCleansing', quad:'cleansing'},
+    {x:CX-R*0.68, y:CY+R*0.74, key:'qTaxing', quad:'taxing'},
+    {x:CX-R*0.68, y:CY-R*0.72, key:'qHearty', quad:'hearty'},
+  ];
+  qLabels.forEach(q=>{
+    const txt = document.createElementNS(svgNS,'text');
+    txt.setAttribute('x',q.x); txt.setAttribute('y',q.y);
+    txt.setAttribute('text-anchor','middle');
+    txt.setAttribute('font-family', "'Plus Jakarta Sans', sans-serif");
+    txt.setAttribute('font-size','9.5'); txt.setAttribute('font-weight','800');
+    txt.setAttribute('fill', DIGEST_QUAD[q.quad].color);
+    txt.setAttribute('opacity','0.75');
+    txt.textContent = t(q.key);
+    svg.appendChild(txt);
+  });
+
+  const filtered = getFilteredIndices();
+  FOODS.forEach((f, idx)=>{
+    const quad = digestQuadrant(f);
+    const x = CX + (f.digest/2)*R;
+    const y = CY - (f.nutri/2)*R;
+    const c = document.createElementNS(svgNS,'circle');
+    c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', 5.5);
+    c.setAttribute('fill', DIGEST_QUAD[quad].color);
+    c.setAttribute('stroke', '#fff'); c.setAttribute('stroke-width', '1.5');
+    c.setAttribute('class','wheel-point');
+    if(digestQuadFilter && quad!==digestQuadFilter) c.classList.add('dim');
+    else if(!filtered.has(idx)) c.classList.add('dim');
+    c.dataset.idx = idx;
+    c.addEventListener('click', ()=> showDetail(idx));
+    c.addEventListener('mouseenter', (e)=> showTooltip(e, f.name));
+    c.addEventListener('mousemove', (e)=> moveTooltip(e));
+    c.addEventListener('mouseleave', hideTooltip);
+    svg.appendChild(c);
+  });
+}
+
+function setCompassMode(mode){
+  compassMode = mode;
+  digestQuadFilter = null;
+  document.querySelectorAll('#compass-mode-toggle button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.mode===mode);
+  });
+  updateCompassSideText();
+  buildWheel();
+  buildLegend();
+}
+
+function showTooltip(e, text){
+  const tip = document.getElementById('tooltip');
+  tip.textContent = text; tip.style.display = 'block';
+  moveTooltip(e);
+}
+function moveTooltip(e){
+  const tip = document.getElementById('tooltip');
+  tip.style.left = (e.clientX + 14) + 'px';
+  tip.style.top = (e.clientY + 14) + 'px';
+}
+function hideTooltip(){ document.getElementById('tooltip').style.display = 'none'; }
+
+function buildLegend(){
+  const legend = document.getElementById('legend');
+  legend.innerHTML = '';
+  if(compassMode==='digest'){
+    const quadMeta = {
+      'efficient':{label:'legendEfficient', desc:'digestEfficientDesc'},
+      'cleansing':{label:'legendCleansing', desc:'digestCleansingDesc'},
+      'hearty':{label:'legendHearty', desc:'digestHeartyDesc'},
+      'taxing':{label:'legendTaxing', desc:'digestTaxingDesc'}
+    };
+    Object.keys(DIGEST_QUAD).forEach(key=>{
+      const d = DIGEST_QUAD[key];
+      const meta = quadMeta[key];
+      const div = document.createElement('div');
+      div.className = 'legend-item' + (digestQuadFilter===key ? ' active' : '');
+      div.innerHTML = `<span class="legend-dot" style="background:${d.color}"></span>
+        <span>${t(meta.label)} <span style="opacity:.55">— ${t(meta.desc)}</span></span>
+        <span class="clear-hint">${t('filterHint')}</span>`;
+      div.addEventListener('click', ()=>{
+        digestQuadFilter = (digestQuadFilter === key) ? null : key;
+        buildDigestWheel();
+        buildLegend();
+      });
+      legend.appendChild(div);
+    });
+    return;
+  }
+  Object.keys(HUMORS).forEach(key=>{
+    const h = HUMORS[key];
+    const meta = HUMOR_META_KEY[key];
+    const div = document.createElement('div');
+    div.className = 'legend-item' + (humorFilter===key ? ' active' : '');
+    div.innerHTML = `<span class="legend-dot" style="background:${h.color}"></span>
+      <span>${t(meta.label)} <span style="opacity:.55">— ${t(meta.temp)}</span></span>
+      <span class="clear-hint">${t('filterHint')}</span>`;
+    div.addEventListener('click', ()=> setHumorFilter(humorFilter===key ? 'all' : key));
+    legend.appendChild(div);
+  });
+}
+
+/* ---------------------------------------------------------
+   FILTERS / SORT
+--------------------------------------------------------- */
+function getFilteredIndices(){
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  const set = new Set();
+  FOODS.forEach((f, idx)=>{
+    if(humorFilter!=='all' && f.humor!==humorFilter) return;
+    if(catFilter!=='all' && f.cat!==catFilter) return;
+    if(q && !f.name.toLowerCase().includes(q) && !f.fa.includes(q)) return;
+    set.add(idx);
+  });
+  return set;
+}
+
+function sortedItems(indices){
+  const sortVal = document.getElementById('sort-select').value;
+  const arr = Array.from(indices).map(idx=>({...FOODS[idx], idx}));
+  if(sortVal==='name') arr.sort((a,b)=> a.name.localeCompare(b.name));
+  else if(sortVal==='hot') arr.sort((a,b)=> b.hot-a.hot);
+  else if(sortVal==='cold') arr.sort((a,b)=> a.hot-b.hot);
+  else if(sortVal==='wet') arr.sort((a,b)=> b.wet-a.wet);
+  else if(sortVal==='dry') arr.sort((a,b)=> a.wet-b.wet);
+  return arr;
+}
+
+function buildChips(){
+  const humorRow = document.getElementById('humor-chips');
+  humorRow.innerHTML = '';
+  const allChip = document.createElement('button');
+  allChip.className = 'chip' + (humorFilter==='all' ? ' active' : '');
+  allChip.textContent = t('chipAllHumor');
+  allChip.onclick = ()=> setHumorFilter('all');
+  humorRow.appendChild(allChip);
+  Object.keys(HUMORS).forEach(key=>{
+    const meta = HUMOR_META_KEY[key];
+    const chip = document.createElement('button');
+    chip.className = 'chip' + (humorFilter===key ? ' active' : '');
+    chip.innerHTML = `<span class="dot" style="background:${HUMORS[key].color}"></span>${t(meta.label)}`;
+    chip.onclick = ()=> setHumorFilter(humorFilter===key ? 'all' : key);
+    humorRow.appendChild(chip);
+  });
+
+  const catRow = document.getElementById('cat-chips');
+  catRow.innerHTML = '';
+  const allCatChip = document.createElement('button');
+  allCatChip.className = 'chip' + (catFilter==='all' ? ' active' : '');
+  allCatChip.textContent = t('chipAllCat');
+  allCatChip.onclick = ()=> setCatFilter('all');
+  catRow.appendChild(allCatChip);
+  CATS.forEach(cat=>{
+    const chip = document.createElement('button');
+    chip.className = 'chip' + (catFilter===cat ? ' active' : '');
+    chip.innerHTML = `${CAT_EMOJI[cat]} ${t(CAT_KEY[cat])}`;
+    chip.onclick = ()=> setCatFilter(catFilter===cat ? 'all' : cat);
+    catRow.appendChild(chip);
+  });
+}
+
+function setHumorFilter(key){ humorFilter = key; renderAll(); }
+function setCatFilter(key){ catFilter = key; renderAll(); }
+
+function setView(view){
+  currentView = view;
+  document.querySelectorAll('#view-toggle button').forEach(b=> b.classList.toggle('active', b.dataset.view===view));
+  document.getElementById('compass-view').style.display = view==='compass' ? 'block' : 'none';
+  document.getElementById('grid-view').style.display = view==='grid' ? 'block' : 'none';
+  renderAll();
+}
+
+/* ---------------------------------------------------------
+   GRID RENDER
+--------------------------------------------------------- */
+function renderGrid(){
+  const filtered = getFilteredIndices();
+  const items = sortedItems(filtered);
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  if(items.length===0){
+    grid.innerHTML = `<div class="empty-msg">${t('emptyMsg')}</div>`;
+    return;
+  }
+  items.forEach(f=>{
+    const h = HUMORS[f.humor];
+    const hcPct = Math.round((Math.abs(f.hot)/4)*100);
+    const wdPct = Math.round((Math.abs(f.wet)/4)*100);
+    const hcColor = f.hot>=0 ? getVar('--hot') : getVar('--cold');
+    const wdColor = f.wet>=0 ? getVar('--wet') : getVar('--dry');
+    const hcLabel = f.hot>=0 ? t('hotWord') : t('coldWord');
+    const wdLabel = f.wet>=0 ? t('moistWord') : t('dryWord');
+    const primaryName = LANG==='fa' ? f.fa : f.name;
+    const secondaryName = LANG==='fa' ? f.name : f.fa;
+    const isAdded = plate.includes(f.idx);
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="card-photo" style="--tile-bg:${hexToSoft(h.color)}">${iconFor(f)}</div>
+        <button class="add-btn ${isAdded?'added':''}" data-idx="${f.idx}">${isAdded?'✓':'+'}</button>
+      </div>
+      <div>
+        <span class="humor-pill" style="background:${h.color}">${t(HUMOR_META_KEY[f.humor].label).split(' ')[0]}</span>
+        <h5>${primaryName}</h5>
+        <div class="secondary-name" style="${LANG==='fa'?'':'direction:rtl;'}">${secondaryName}</div>
+      </div>
+      <div class="gauges">
+        <div class="gauge">
+          <div class="gauge-ring" style="--pct:${hcPct}; --ring-color:${hcColor};"><span>${toPersianDigits(Math.abs(f.hot))}°</span></div>
+          <div class="gauge-label">${hcLabel}</div>
+        </div>
+        <div class="gauge">
+          <div class="gauge-ring" style="--pct:${wdPct}; --ring-color:${wdColor};"><span>${toPersianDigits(Math.abs(f.wet))}°</span></div>
+          <div class="gauge-label">${wdLabel}</div>
+        </div>
+      </div>
+    `;
+    card.addEventListener('click', (e)=>{
+      if(e.target.closest('.add-btn')) return;
+      showDetail(f.idx);
+    });
+    card.querySelector('.add-btn').addEventListener('click', (e)=>{
+      e.stopPropagation();
+      togglePlate(f.idx);
+    });
+    grid.appendChild(card);
+  });
+}
+
+function getVar(name){
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function updateCompassSideText(){
+  const titleEl = document.getElementById('compass-side-title');
+  const pEl = document.getElementById('compass-side-p');
+  if(!titleEl || !pEl) return;
+  titleEl.textContent = compassMode==='digest' ? t('digestSideTitle') : t('wheelSideTitle');
+  pEl.textContent = compassMode==='digest' ? t('digestSideP') : t('wheelSideP');
+}
+
+function renderAll(){
+  buildChips();
+  if(currentView==='grid') renderGrid();
+  else buildWheel();
+  buildLegend();
+  updateCompassSideText();
+  updateStats();
+}
+
+/* ---------------------------------------------------------
+   DETAIL DRAWER
+--------------------------------------------------------- */
+function showDetail(idx){
+  activeDetailIdx = idx;
+  const f = FOODS[idx];
+  const meta = HUMOR_META_KEY[f.humor];
+  const primaryName = LANG==='fa' ? f.fa : f.name;
+  const secondaryName = LANG==='fa' ? f.name : f.fa;
+
+  document.getElementById('d-emoji').textContent = iconFor(f);
+  document.getElementById('d-emoji').style.setProperty('--tile-bg', hexToSoft(HUMORS[f.humor].color));
+  document.getElementById('d-name').textContent = primaryName;
+  document.getElementById('d-secondary').textContent = secondaryName;
+  document.getElementById('d-secondary').style.direction = LANG==='fa' ? 'ltr':'rtl';
+  document.getElementById('d-secondary').style.textAlign = LANG==='fa' ? 'left':'right';
+
+  const pills = document.getElementById('d-pills');
+  pills.innerHTML = '';
+  const catPill = document.createElement('span');
+  catPill.className = 'd-pill'; catPill.style.background = '#9BA0B4';
+  catPill.textContent = `${CAT_EMOJI[f.cat]} ${t(CAT_KEY[f.cat])}`;
+  pills.appendChild(catPill);
+  const humorPill = document.createElement('span');
+  humorPill.className = 'd-pill'; humorPill.style.background = HUMORS[f.humor].color;
+  humorPill.textContent = `${t(meta.label)} · ${t(meta.temp)}`;
+  pills.appendChild(humorPill);
+
+  const hcPct = Math.round((Math.abs(f.hot)/4)*100);
+  const wdPct = Math.round((Math.abs(f.wet)/4)*100);
+  const hcColor = f.hot>=0 ? getVar('--hot') : getVar('--cold');
+  const wdColor = f.wet>=0 ? getVar('--wet') : getVar('--dry');
+  document.getElementById('d-gauge-hc').style.setProperty('--pct', hcPct);
+  document.getElementById('d-gauge-hc').style.setProperty('--ring-color', hcColor);
+  document.getElementById('d-gauge-hc-num').textContent = toPersianDigits(Math.abs(f.hot)) + '°';
+  document.getElementById('d-gauge-hc-label').textContent = (f.hot>=0 ? t('hotWord') : t('coldWord'));
+  document.getElementById('d-gauge-wd').style.setProperty('--pct', wdPct);
+  document.getElementById('d-gauge-wd').style.setProperty('--ring-color', wdColor);
+  document.getElementById('d-gauge-wd-num').textContent = toPersianDigits(Math.abs(f.wet)) + '°';
+  document.getElementById('d-gauge-wd-label').textContent = (f.wet>=0 ? t('moistWord') : t('dryWord'));
+
+  document.getElementById('d-note').textContent = f.note;
+  document.getElementById('d-note').style.direction = 'ltr';
+  document.getElementById('d-note').style.textAlign = LANG==='fa' ? 'right' : 'left';
+
+  const hint = document.getElementById('d-note-hint');
+  if(LANG==='fa'){ hint.style.display='block'; hint.textContent = t('noteLangHint'); }
+  else hint.style.display='none';
+
+  // Compass for this ingredient
+  drawCompass('d-compass', [{ x:f.hot, y:f.wet, color:HUMORS[f.humor].color, radius:7 }]);
+  const hotLbl = f.hot>=0 ? t('hotWord') : t('coldWord');
+  const wetLbl = f.wet>=0 ? t('moistWord') : t('dryWord');
+  document.getElementById('d-compass-caption').innerHTML = t('compassSectionCaption')
+    .replace('{name}', primaryName)
+    .replace('{hotLabel}', hotLbl)
+    .replace('{hotDeg}', toPersianDigits(Math.abs(f.hot)))
+    .replace('{wetLabel}', wetLbl)
+    .replace('{wetDeg}', toPersianDigits(Math.abs(f.wet)));
+
+  // Digestibility compass for this ingredient
+  const dQuad = digestQuadrant(f);
+  const quadColors = [DIGEST_QUAD.efficient.color, DIGEST_QUAD.cleansing.color, DIGEST_QUAD.taxing.color, DIGEST_QUAD.hearty.color];
+  const quadIcons = [DIGEST_ICONS.efficient, DIGEST_ICONS.cleansing, DIGEST_ICONS.taxing, DIGEST_ICONS.hearty];
+  drawCompass('d-digest-compass', [{ x:f.digest, y:f.nutri, color:DIGEST_QUAD[dQuad].color, radius:7 }], { quadColors, quadIcons, scale:2 });
+  const digestLbl = f.digest>=0 ? t('lightWord') : t('heavyWord');
+  const nutriLbl = f.nutri>=0 ? t('highNutriWord') : t('lowNutriWord');
+  const quadKeyMap = { efficient:'legendEfficient', cleansing:'legendCleansing', hearty:'legendHearty', taxing:'legendTaxing' };
+  document.getElementById('d-digest-caption').innerHTML = t('drawerDigestCaption')
+    .replace('{name}', primaryName)
+    .replace('{digestLabel}', digestLbl)
+    .replace('{nutriLabel}', nutriLbl)
+    .replace('{quadName}', t(quadKeyMap[dQuad]));
+
+  const digestSrcEl = document.getElementById('d-digest-source-note');
+  if(f.digestNote){
+    digestSrcEl.style.display = 'block';
+    digestSrcEl.textContent = f.digestNote + (LANG==='fa' ? '  ·  ' + t('noteLangHint') : '');
+  } else {
+    digestSrcEl.style.display = 'none';
+  }
+
+  // Complementary foods (Mosleh)
+  const mosleh = getMosleh(f);
+  document.getElementById('mosleh-title').textContent = t('moslehTitle');
+  document.getElementById('mosleh-note').textContent =
+    (mosleh.traditional ? t('moslehNoteTraditional') : t('moslehNoteGeneric')).replace('{name}', primaryName);
+  const chipsWrap = document.getElementById('mosleh-chips');
+  chipsWrap.innerHTML = '';
+  mosleh.indices.forEach(mi=>{
+    const mf = FOODS[mi];
+    const mName = LANG==='fa' ? mf.fa : mf.name;
+    const chip = document.createElement('button');
+    chip.className = 'mosleh-chip';
+    chip.innerHTML = `${iconFor(mf)} ${mName}`;
+    chip.addEventListener('click', ()=> showDetail(mi));
+    chipsWrap.appendChild(chip);
+  });
+
+  updateDrawerAddBtn();
+
+  document.getElementById('drawer').classList.add('show');
+  document.getElementById('drawer-backdrop').classList.add('show');
+  document.getElementById('drawer').scrollTop = 0;
+}
+function closeDetail(){
+  document.getElementById('drawer').classList.remove('show');
+  document.getElementById('drawer-backdrop').classList.remove('show');
+  activeDetailIdx = null;
+}
+function updateDrawerAddBtn(){
+  const btn = document.getElementById('d-add-btn');
+  const isAdded = plate.includes(activeDetailIdx);
+  btn.textContent = isAdded ? t('addedToPlate') : ('+ ' + t('addToPlate'));
+  btn.classList.toggle('added', isAdded);
+}
+function toggleDrawerAdd(){
+  togglePlate(activeDetailIdx);
+  updateDrawerAddBtn();
+}
+
+/* ---------------------------------------------------------
+   PLATE / BALANCE
+--------------------------------------------------------- */
+function togglePlate(idx){
+  const pos = plate.indexOf(idx);
+  if(pos>=0) plate.splice(pos,1); else plate.push(idx);
+  updateTray();
+  if(currentView==='grid') renderGrid();
+  if(document.getElementById('modal-backdrop').classList.contains('show')) renderPlateModal();
+}
+function updateTray(){
+  const tray = document.getElementById('tray');
+  document.getElementById('tray-count').textContent = toPersianDigits(plate.length);
+  document.getElementById('tray-label').textContent = t('trayLabel');
+  tray.classList.toggle('show', plate.length>0);
+}
+function openBalanceModal(){
+  document.getElementById('modal-backdrop').classList.add('show');
+  renderPlateModal();
+}
+function closeBalanceModal(){ document.getElementById('modal-backdrop').classList.remove('show'); }
+
+function renderPlateModal(){
+  const container = document.getElementById('plate-content');
+  if(plate.length===0){
+    container.innerHTML = `<div class="empty-plate">${t('emptyPlate')}</div>`;
+    return;
+  }
+  let html = '<div class="plate-list">';
+  plate.forEach(idx=>{
+    const f = FOODS[idx];
+    const name = LANG==='fa' ? f.fa : f.name;
+    html += `<div class="plate-item">
+      <span class="dot" style="background:${HUMORS[f.humor].color}"></span>
+      <span class="name">${name}</span>
+      <button class="remove" onclick="togglePlate(${idx})">✕</button>
+    </div>`;
+  });
+  html += '</div>';
+
+  const avgHot = plate.reduce((s,idx)=> s+FOODS[idx].hot, 0) / plate.length;
+  const avgWet = plate.reduce((s,idx)=> s+FOODS[idx].wet, 0) / plate.length;
+  const quadrant = avgHot>=0 ? (avgWet>=0 ? 'blood' : 'bile-y') : (avgWet>=0 ? 'phlegm' : 'bile-b');
+  const magnitude = Math.sqrt(avgHot*avgHot + avgWet*avgWet);
+  const balanced = magnitude < 0.7;
+
+  html += `<div class="balance-visual">
+    <svg id="mini-compass" viewBox="0 0 140 140"></svg>
+    <div class="verdict-text">
+      <div class="verdict-title">${balanced ? t('verdictBalancedTitle') : t('verdict'+quadKeySuffix(quadrant)+'Title')}</div>
+      <div>${balanced ? t('verdictBalanced') : t('verdict'+quadKeySuffix(quadrant))}</div>
+    </div>
+  </div>`;
+
+  if(!balanced){
+    const oppMap = { 'blood':'bile-b', 'bile-y':'phlegm', 'bile-b':'blood', 'phlegm':'bile-y' };
+    const opp = oppMap[quadrant];
+    const candidates = FOODS
+      .map((f, idx)=>({...f, idx}))
+      .filter(f => f.humor===opp && !plate.includes(f.idx))
+      .sort((a,b)=> (Math.abs(b.hot)+Math.abs(b.wet)) - (Math.abs(a.hot)+Math.abs(a.wet)))
+      .slice(0,4);
+    if(candidates.length){
+      html += `<div class="suggest-title">${t('suggestTitle')}</div><div class="suggest-row">`;
+      candidates.forEach(f=>{
+        const name = LANG==='fa' ? f.fa : f.name;
+        html += `<button class="suggest-chip" onclick="togglePlate(${f.idx})">${iconFor(f)} ${name}</button>`;
+      });
+      html += '</div>';
+    }
+  }
+
+  html += `<button class="clear-plate-btn" onclick="clearPlate()">${t('clearPlate')}</button>`;
+  container.innerHTML = html;
+  drawCompass('mini-compass', [{ x:avgHot, y:avgWet, color:HUMORS[quadrant].color }]);
+}
+
+function quadKeySuffix(q){
+  return { 'blood':'Blood', 'bile-y':'BileY', 'bile-b':'BileB', 'phlegm':'Phlegm' }[q];
+}
+
+/* Generic small compass renderer.
+   svgId: target <svg> element id, viewBox assumed square.
+   points: array of { x, y, color, radius (optional), pulse (optional bool) }
+     x,y are in the same units as `scale` (e.g. -4..4 for mizaj, -2..2 for digestibility)
+   opts: { quadColors: [topRight, bottomRight, bottomLeft, topLeft], quadIcons: [...], scale } */
+function drawCompass(svgId, points, opts){
+  opts = opts || {};
+  const quadColors = opts.quadColors || [HUMORS['blood'].color, HUMORS['bile-y'].color, HUMORS['bile-b'].color, HUMORS['phlegm'].color];
+  const quadIcons = opts.quadIcons || [MIZAJ_ICONS.blood, MIZAJ_ICONS['bile-y'], MIZAJ_ICONS['bile-b'], MIZAJ_ICONS.phlegm];
+  const scale = opts.scale || 4;
+  const svg = document.getElementById(svgId);
+  if(!svg) return;
+  svg.innerHTML = '';
+  const vb = svg.viewBox.baseVal;
+  const size = vb && vb.width ? vb.width : 140;
+  const cx = size/2, cy = size/2, r = size/2 - 10;
+  drawQuadrantWedges(svg, cx, cy, r, quadColors, quadIcons, '0.3');
+  drawCompassChrome(svg, cx, cy, r, false);
+  points.forEach(p=>{
+    const px = cx + (p.x/scale)*r;
+    const py = cy - (p.y/scale)*r;
+    if(p.pulse!==false){
+      const pulse = document.createElementNS(svgNS,'circle');
+      pulse.setAttribute('cx', px); pulse.setAttribute('cy', py); pulse.setAttribute('r', (p.radius||8)+5);
+      pulse.setAttribute('fill', 'none'); pulse.setAttribute('stroke', p.color);
+      pulse.setAttribute('stroke-width', '2'); pulse.setAttribute('opacity', '0.4');
+      svg.appendChild(pulse);
+    }
+    const dot = document.createElementNS(svgNS,'circle');
+    dot.setAttribute('cx', px); dot.setAttribute('cy', py); dot.setAttribute('r', p.radius||8);
+    dot.setAttribute('fill', p.color);
+    dot.setAttribute('stroke', '#fff'); dot.setAttribute('stroke-width', '2.5');
+    svg.appendChild(dot);
+  });
+}
+
+function clearPlate(){
+  plate = [];
+  updateTray();
+  if(currentView==='grid') renderGrid();
+  renderPlateModal();
+}
+
+/* ---------------------------------------------------------
+   STATS
+--------------------------------------------------------- */
+function updateStats(){
+  document.getElementById('stat-count').textContent = toPersianDigits(FOODS.length);
+  document.getElementById('stat-cats').textContent = toPersianDigits(CATS.length);
+}
+
+/* ---------------------------------------------------------
+   LANGUAGE SWITCH
+--------------------------------------------------------- */
+function applyStaticText(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    el.textContent = t(el.getAttribute('data-i18n'));
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{
+    el.innerHTML = t(el.getAttribute('data-i18n-html'));
+  });
+  document.getElementById('search').placeholder = t('searchPlaceholder');
+  document.getElementById('sort-select').querySelectorAll('option').forEach(opt=>{
+    opt.textContent = t(opt.getAttribute('data-i18n'));
+  });
+}
+
+function setLang(lang){
+  LANG = lang;
+  document.getElementById('html-root').lang = lang;
+  document.getElementById('html-root').dir = lang==='fa' ? 'rtl' : 'ltr';
+  document.body.classList.toggle('rtl', lang==='fa');
+  document.getElementById('btn-en').classList.toggle('active', lang==='en');
+  document.getElementById('btn-fa').classList.toggle('active', lang==='fa');
+
+  applyStaticText();
+  renderAll();
+  updateTray();
+  if(activeDetailIdx !== null) showDetail(activeDetailIdx);
+  if(document.getElementById('modal-backdrop').classList.contains('show')) renderPlateModal();
+}
+
+/* ---------------------------------------------------------
+   INIT
+--------------------------------------------------------- */
+applyStaticText();
+renderAll();
+updateTray();
+</script>
+</body>
+</html>
